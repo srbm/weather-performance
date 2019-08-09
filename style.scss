@@ -1,0 +1,25 @@
+//epl colors
+$epl-blue: #04f5ff;
+$epl-pink: #e90052;
+$epl-green: #00ff85;
+$epl-purple: #38003c;
+body {
+    background-color: $epl-green;
+}
+
+h1 {
+    font-size: 36px;
+    color: $epl-purple;
+}
+
+.header {
+    padding: 1em 2em;
+    // border: solid 2em $epl-pink;
+    &__logo {
+        max-width: 300px;
+        display: inline-block;
+    }
+    &__headline {
+        display: inline-block;
+    }
+}

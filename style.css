@@ -1,0 +1,16 @@
+body {
+  background-color: #00ff85; }
+
+h1 {
+  font-size: 36px;
+  color: #38003c; }
+
+.header {
+  padding: 1em 2em; }
+  .header__logo {
+    max-width: 300px;
+    display: inline-block; }
+  .header__headline {
+    display: inline-block; }
+
+/*# sourceMappingURL=style.css.map */
