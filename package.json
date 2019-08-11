@@ -1,0 +1,30 @@
+{
+  "name": "weather-performance",
+  "version": "1.0.0",
+  "description": "check performance of a premiere league team in certain weather",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/srbm/weather-performance.git"
+  },
+  "keywords": [
+    "api",
+    "javascript",
+    "football",
+    "soccer",
+    "weather"
+  ],
+  "author": "srbm",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/srbm/weather-performance/issues"
+  },
+  "homepage": "https://github.com/srbm/weather-performance#readme",
+  "devDependencies": {
+    "eslint": "^6.1.0",
+    "eslint-config-google": "^0.13.0"
+  }
+}

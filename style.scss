@@ -1,25 +1,81 @@
 //epl colors
 $epl-blue: #04f5ff;
 $epl-pink: #e90052;
+$epl-pink: rgb(233,0,82);
 $epl-green: #00ff85;
+$epl-green: rgb(0, 255, 133);
 $epl-purple: #38003c;
-body {
-    background-color: $epl-green;
+
+*, body {
+    box-sizing: border-box;
 }
 
 h1 {
     font-size: 36px;
     color: $epl-purple;
+    font-family: sans-serif;
 }
 
 .header {
+    background-color: $epl-green;
     padding: 1em 2em;
-    // border: solid 2em $epl-pink;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    border-bottom: 2px solid $epl-purple;
+    border-left: 10px solid $epl-purple;
+    border-right: 10px solid $epl-purple;
+    box-shadow: 0 5px 5px rgba(0,0,0,0.2);
+    margin-bottom: 1.5em;
     &__logo {
-        max-width: 300px;
-        display: inline-block;
+        max-width: 250px;
     }
     &__headline {
-        display: inline-block;
+        margin: 0 2em;
+    }
+    &__text {
+        flex-basis: 37%;
+        margin: 2.5em auto 1em;
+    }
+    h2, p {
+        width: 250px;
+        margin: .5em auto 0;
+    }
+}
+section:first-child {
+    text-align: center;
+    h2 {
+        font-size: 28px;
+        font-family: sans-serif;
+        margin-bottom: 1.2em;
+    }
+}
+.teams {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    .team {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        // width: 150px;
+        border: 2px solid black;
+        border-radius: 3px;
+        margin: 1em .5em; 
+        padding: .7em;
+        transition: .4s;
+        object-fit: contain;
+        cursor: pointer;
+        &:hover {
+            box-shadow: 2px 2px 6px rgba(0, 255, 133, 0.6);
+            border: 2px solid $epl-pink;
+        }
+        img {
+            height: 170px;
+        }
+        h3 {
+            margin-top: .5em;
+        }
     }
 }
