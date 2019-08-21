@@ -35,7 +35,7 @@ h1 {
         margin: 0 2em;
     }
     &__text {
-        flex-basis: 37%;
+        flex-basis: 50%;
         margin: 2.5em auto 1em;
     }
     h2, p {
@@ -68,7 +68,7 @@ section:first-child {
         object-fit: contain;
         cursor: pointer;
         &:hover {
-            box-shadow: 2px 2px 6px rgba(0, 255, 133, 0.6);
+            box-shadow: 2px 2px 6px rgba(4,245,255, 0.8);
             border: 2px solid $epl-pink;
         }
         img {

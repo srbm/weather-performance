@@ -23,7 +23,7 @@ h1 {
   .header__headline {
     margin: 0 2em; }
   .header__text {
-    flex-basis: 37%;
+    flex-basis: 50%;
     margin: 2.5em auto 1em; }
   .header h2, .header p {
     width: 250px;
@@ -52,7 +52,7 @@ section:first-child {
     object-fit: contain;
     cursor: pointer; }
     .teams .team:hover {
-      box-shadow: 2px 2px 6px rgba(0, 255, 133, 0.6);
+      box-shadow: 2px 2px 6px rgba(4, 245, 255, 0.8);
       border: 2px solid #e90052; }
     .teams .team img {
       height: 170px; }
