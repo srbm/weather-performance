@@ -106,31 +106,41 @@ function makeWeatherCallParamsObj(matches, homeTeamArr, WCObj) {
 }
 
 function returnWeatherPromise(paramsArr, i) {
-  return fetch(`https://cors-anywhere.herokuapp.com/https://api.darksky.net/forecast/9f2b441e09bacb0213aaa8eab1f74725/${paramsArr[i].lat},${paramsArr[i].long},${paramsArr[i].utcDate}`)
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error ("fetch weather unsuccessful");
-        }
-        return response.json();
-      }).catch( (e) => {
-        console.error(e);
-      });
+  return fetch(`https://cors-anywhere.herokuapp.com/https://api.darksky.net/forecast/9f2b441e09bacb0213aaa8eab1f74725/${paramsArr[i].lat},${paramsArr[i].long},${paramsArr[i].utcDate}`);
+      // .then((response) => {
+      //   if (!response.ok) {
+      //     throw new Error ("fetch weather unsuccessful");
+      //   }
+      //   // return response.json();
+      // }).catch( (e) => {
+      //   console.error(e);
+      // });
 }
 
 function getWeathersData(paramsArr) {
   const weathersArr = [];
   const weatherChoices = new Set();
   for (let i=0; i < paramsArr.length; i++) {
-    returnWeatherPromise(paramsArr, i).then((data) => {
-      // console.log(data);
-      weathersArr.push(data.currently.icon);
-      weatherChoices.add(data.currently.icon)
-    });
+    weathersArr.push(returnWeatherPromise(paramsArr, i));
   }
+  console.log(weathersArr);
+  Promise.all(weathersArr).then(arr => {
+    console.log(arr);
+    const promArr = [];
+    arr.forEach(item => {
+      promArr.push(item.json());
+    });
+    Promise.all(promArr).then(data => {
+      console.log(data);
+      data.forEach(item => {
+        weatherChoices.add(item.currently.icon);
+      });
+    });
+  });
   return weatherChoices;
 }
 function makeIconDivs(weatherChoices) {
-  console.log(weatherChoices.size);
+  console.log(weatherChoices);
   weatherChoices.forEach(function(icon) {
     console.log(icon);
     // $('.weathers').append(`<div class="${icon}"><img src="https://picsum.photos/200/300" alt="${icon}"/></div>`);
