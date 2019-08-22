@@ -4,7 +4,7 @@
 
 function fetchLeagueTeams() {
   fetch(`http://api.football-data.org/v2/competitions/PL/teams?season=2018`,
-      {headers: {'X-Auth-Token': footballToken}})
+      {headers: {'X-Auth-Token': '42b54b95666e4b969e41a0e7361afe71'}})
       .then((response) => {
         response.json().then(response => {
           console.log(response);
@@ -56,7 +56,7 @@ function getLocationDate(data) {
 
 function fetchAllTeamMatches(teamId) {
   return fetch(`http://api.football-data.org/v2/teams/${teamId}/matches?dateFrom=2018-08-10&dateTo=2019-05-12`,
-      {headers: {'X-Auth-Token': footballToken}})
+      {headers: {'X-Auth-Token': '42b54b95666e4b969e41a0e7361afe71'}})
       .then((response) => {
         if (!response.ok) {
           throw new Error ("fetch team matches unsuccessful");
@@ -106,7 +106,7 @@ function makeWeatherCallParamsObj(matches, homeTeamArr, WCObj) {
 }
 
 function returnWeatherPromise(paramsArr, i) {
-  return fetch(`http://cors-anywhere.herokuapp.com/https://api.darksky.net/forecast/${weatherToken}/${paramsArr[i].lat},${paramsArr[i].long},${paramsArr[i].utcDate}`)
+  return fetch(`http://cors-anywhere.herokuapp.com/https://api.darksky.net/forecast/9f2b441e09bacb0213aaa8eab1f74725/${paramsArr[i].lat},${paramsArr[i].long},${paramsArr[i].utcDate}`)
       .then((response) => {
         if (!response.ok) {
           throw new Error ("fetch weather unsuccessful");
@@ -130,7 +130,7 @@ function getWeathersData(paramsArr) {
   return weatherChoices;
 }
 function makeIconDivs(weatherChoices) {
-  // console.log(weatherChoices);
+  console.log(weatherChoices.size);
   weatherChoices.forEach(function(icon) {
     console.log(icon);
     // $('.weathers').append(`<div class="${icon}"><img src="https://picsum.photos/200/300" alt="${icon}"/></div>`);
