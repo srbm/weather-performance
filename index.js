@@ -55,7 +55,7 @@ function getLocationDate(data) {
 }
 
 function fetchAllTeamMatches(teamId) {
-  return fetch(`http://api.football-data.org/v2/teams/${teamId}/matches?dateFrom=2018-08-10&dateTo=2019-05-12`,
+  return fetch(`https://api.football-data.org/v2/teams/${teamId}/matches?dateFrom=2018-08-10&dateTo=2019-05-12`,
       {headers: {'X-Auth-Token': '42b54b95666e4b969e41a0e7361afe71'}})
       .then((response) => {
         if (!response.ok) {
@@ -106,7 +106,7 @@ function makeWeatherCallParamsObj(matches, homeTeamArr, WCObj) {
 }
 
 function returnWeatherPromise(paramsArr, i) {
-  return fetch(`http://cors-anywhere.herokuapp.com/https://api.darksky.net/forecast/9f2b441e09bacb0213aaa8eab1f74725/${paramsArr[i].lat},${paramsArr[i].long},${paramsArr[i].utcDate}`)
+  return fetch(`https://cors-anywhere.herokuapp.com/https://api.darksky.net/forecast/9f2b441e09bacb0213aaa8eab1f74725/${paramsArr[i].lat},${paramsArr[i].long},${paramsArr[i].utcDate}`)
       .then((response) => {
         if (!response.ok) {
           throw new Error ("fetch weather unsuccessful");
