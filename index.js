@@ -39,10 +39,11 @@ function changeToWeatherOptions(teamId) {
     // determine weather icons
   }).then(weatherCallParams => {
     return getWeathersData(weatherCallParams);
-  }).then(weatherChoices  => {
-    console.log(weatherChoices);
-    // show weather icons
-    makeIconDivs(weatherChoices);
+  // })
+  // .then(weatherChoices  => {
+  //   console.log(weatherChoices);
+  //   // show weather icons
+  //   makeIconDivs(weatherChoices);
   }).catch(err => console.log(err));
 }
 
@@ -131,19 +132,19 @@ function getWeathersData(paramsArr) {
       promArr.push(item.json());
     });
     Promise.all(promArr).then(data => {
-      console.log(data);
       data.forEach(item => {
         weatherChoices.add(item.currently.icon);
       });
+      console.log(weatherChoices);
+      makeIconDivs(weatherChoices);
     });
   });
-  return weatherChoices;
 }
 function makeIconDivs(weatherChoices) {
   console.log(weatherChoices);
   weatherChoices.forEach(function(icon) {
     console.log(icon);
-    // $('.weathers').append(`<div class="${icon}"><img src="https://picsum.photos/200/300" alt="${icon}"/></div>`);
+    $('.weathers').append(`<div class="${icon}"><img src="https://picsum.photos/200/300" alt="${icon}"/></div>`);
   });
 }
 
