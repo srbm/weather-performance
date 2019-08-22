@@ -27,32 +27,34 @@ function addTeamsToDom(response) {
 function handleTeamClick() {
   $('.team').on('click', function() {
     const teamId = $(this).data('team-id');
+    hideAllTeams();
     changeToWeatherOptions(teamId)
   });
 }
 
 function changeToWeatherOptions(teamId) {
-  fetchTeamMatches(teamId).then(data => {
-    getTeamMatchesData(data);
-    const weatherCallParams = getLocationDate(data);
-    getWeathersData(weatherCallParams);
-    // make season long array of data location for weather calls
-    // make weather calls
-    // hide teams
+  fetchAllTeamMatches(teamId).then(data => {
+    // getPLTeamMatchesData(data);
+    return getLocationDate(data);
     // determine weather icons
+  }).then(weatherCallParams => {
+    return getWeathersData(weatherCallParams);
+  }).then(weatherChoices  => {
+    console.log(weatherChoices);
     // show weather icons
-  });
+    makeIconDivs(weatherChoices);
+  }).catch(err => console.log(err));
 }
 
 function getLocationDate(data) {
   const weatherCallParams = [];
-  const matches = getGameHomeTeam(getTeamMatchesData(data));
-  makeWeatherCallParamsObj(getTeamMatchesData(data), matches, weatherCallParams);
+  const matches = getGameHomeTeam(getPLTeamMatchesData(data));
+  makeWeatherCallParamsObj(getPLTeamMatchesData(data), matches, weatherCallParams);
   console.log(weatherCallParams);
   return weatherCallParams;
 }
 
-function fetchTeamMatches(teamId) {
+function fetchAllTeamMatches(teamId) {
   return fetch(`http://api.football-data.org/v2/teams/${teamId}/matches?dateFrom=2018-08-10&dateTo=2019-05-12`,
       {headers: {'X-Auth-Token': footballToken}})
       .then((response) => {
@@ -67,14 +69,14 @@ function fetchTeamMatches(teamId) {
       });
 }
 
-function getTeamMatchesData(data) {
-  const teamMatches = [];
+function getPLTeamMatchesData(data) {
+  const PLMatches = [];
   for (let i = 0; i<data.count; i++) {
     if (data.matches[i].competition.name === "Premier League") {
-      teamMatches.push(data.matches[i]);
+      PLMatches.push(data.matches[i]);
     }
   }
-  return (teamMatches);
+  return (PLMatches);
 }
 
 function getGameHomeTeam(matches) {
@@ -83,6 +85,10 @@ function getGameHomeTeam(matches) {
     location.push(ele.homeTeam);
   });
   return location;
+}
+
+function hideAllTeams() {
+  $('.teams').hide();
 }
 
 function makeWeatherCallParamsObj(matches, homeTeamArr, WCObj) {
@@ -113,13 +119,22 @@ function returnWeatherPromise(paramsArr, i) {
 
 function getWeathersData(paramsArr) {
   const weathersArr = [];
+  const weatherChoices = new Set();
   for (let i=0; i < paramsArr.length; i++) {
     returnWeatherPromise(paramsArr, i).then((data) => {
-      console.log(data.currently.summary);
-      weathersArr.push(data.currently.summary);
+      // console.log(data);
+      weathersArr.push(data.currently.icon);
+      weatherChoices.add(data.currently.icon)
     });
   }
-  console.log(weathersArr);
+  return weatherChoices;
+}
+function makeIconDivs(weatherChoices) {
+  // console.log(weatherChoices);
+  weatherChoices.forEach(function(icon) {
+    console.log(icon);
+    // $('.weathers').append(`<div class="${icon}"><img src="https://picsum.photos/200/300" alt="${icon}"/></div>`);
+  });
 }
 
 const latLong = [
@@ -160,8 +175,8 @@ const latLong = [
     'lat': 52.620607,
     'long': -1.141538},
   {'team': 'Southampton FC',
-    'lat': 550.906015,
-    'long': -1.390642},
+    'lat': 50.905842,
+    'long': -1.390942},
   {'team': 'Watford FC',
     'lat': 51.650020,
     'long': -0.401478},
