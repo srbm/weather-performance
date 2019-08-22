@@ -35,13 +35,13 @@ function changeToWeatherOptions(teamId) {
   fetchTeamMatches(teamId).then(data => {
     getTeamMatchesData(data);
     const weatherCallParams = getLocationDate(data);
-    getWeathers(weatherCallParams);
-    //make season long array of data location for weather calls
-    //make weather calls
-    //hide teams
-    //determine weather icons
-    //show weather icons
-  })
+    getWeathersData(weatherCallParams);
+    // make season long array of data location for weather calls
+    // make weather calls
+    // hide teams
+    // determine weather icons
+    // show weather icons
+  });
 }
 
 function getLocationDate(data) {
@@ -66,16 +66,6 @@ function fetchTeamMatches(teamId) {
         console.error(e);
       });
 }
-
-
-
-
-
-
-
-
-
-
 
 function getTeamMatchesData(data) {
   const teamMatches = [];
@@ -109,13 +99,27 @@ function makeWeatherCallParamsObj(matches, homeTeamArr, WCObj) {
   }
 }
 
-function getWeathers(paramsArr) {
-  fetch(`http://cors-anywhere.herokuapp.com/https://api.darksky.net/forecast/dc12767cc064574f42ea70d040f2b00b/${paramsArr[0].lat},${paramsArr[0].long},${paramsArr[0].utcDate}`).then(function(response) {
-    response.json().then((data) => {
-      console.log(data);
+function returnWeatherPromise(paramsArr, i) {
+  return fetch(`http://cors-anywhere.herokuapp.com/https://api.darksky.net/forecast/${weatherToken}/${paramsArr[i].lat},${paramsArr[i].long},${paramsArr[i].utcDate}`)
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error ("fetch weather unsuccessful");
+        }
+        return response.json();
+      }).catch( (e) => {
+        console.error(e);
+      });
+}
+
+function getWeathersData(paramsArr) {
+  const weathersArr = [];
+  for (let i=0; i < paramsArr.length; i++) {
+    returnWeatherPromise(paramsArr, i).then((data) => {
       console.log(data.currently.summary);
+      weathersArr.push(data.currently.summary);
     });
-  });
+  }
+  console.log(weathersArr);
 }
 
 const latLong = [
