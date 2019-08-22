@@ -3,7 +3,7 @@
 'use strict';
 
 function fetchLeagueTeams() {
-  fetch(`http://api.football-data.org/v2/competitions/PL/teams?season=2018`,
+  fetch(`https://api.football-data.org/v2/competitions/PL/teams?season=2018`,
       {headers: {'X-Auth-Token': '42b54b95666e4b969e41a0e7361afe71'}})
       .then((response) => {
         response.json().then(response => {
