@@ -36,14 +36,9 @@ function changeToWeatherOptions(teamId) {
   fetchAllTeamMatches(teamId).then(data => {
     // getPLTeamMatchesData(data);
     return getLocationDate(data);
-    // determine weather icons
+    // determine and show weather icons
   }).then(weatherCallParams => {
     return getWeathersData(weatherCallParams);
-  // })
-  // .then(weatherChoices  => {
-  //   console.log(weatherChoices);
-  //   // show weather icons
-  //   makeIconDivs(weatherChoices);
   }).catch(err => console.log(err));
 }
 
@@ -108,14 +103,6 @@ function makeWeatherCallParamsObj(matches, homeTeamArr, WCObj) {
 
 function returnWeatherPromise(paramsArr, i) {
   return fetch(`https://cors-anywhere.herokuapp.com/https://api.darksky.net/forecast/9f2b441e09bacb0213aaa8eab1f74725/${paramsArr[i].lat},${paramsArr[i].long},${paramsArr[i].utcDate}`);
-      // .then((response) => {
-      //   if (!response.ok) {
-      //     throw new Error ("fetch weather unsuccessful");
-      //   }
-      //   // return response.json();
-      // }).catch( (e) => {
-      //   console.error(e);
-      // });
 }
 
 function getWeathersData(paramsArr) {
@@ -124,9 +111,7 @@ function getWeathersData(paramsArr) {
   for (let i=0; i < paramsArr.length; i++) {
     weathersArr.push(returnWeatherPromise(paramsArr, i));
   }
-  console.log(weathersArr);
   Promise.all(weathersArr).then(arr => {
-    console.log(arr);
     const promArr = [];
     arr.forEach(item => {
       promArr.push(item.json());
@@ -135,7 +120,6 @@ function getWeathersData(paramsArr) {
       data.forEach(item => {
         weatherChoices.add(item.currently.icon);
       });
-      console.log(weatherChoices);
       makeIconDivs(weatherChoices);
     });
   });
@@ -144,7 +128,10 @@ function makeIconDivs(weatherChoices) {
   console.log(weatherChoices);
   weatherChoices.forEach(function(icon) {
     console.log(icon);
-    $('.weathers').append(`<div class="${icon}"><img src="https://picsum.photos/200/300" alt="${icon}"/></div>`);
+    $('.weathers').append(`<div class="weather ${icon}">
+                            <i class="wi wi-forecast-io-${icon} alt="${icon}"/></i>
+                              <p>${icon}</p>
+                          </div>`);
   });
 }
 
