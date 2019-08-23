@@ -16,8 +16,8 @@ function fetchLeagueTeams() {
 function addTeamsToDom(response) {
   for (let i = 0; i<20; i++) {
     const teamId = response.teams[i].id;
-    const teamAddress = response.teams[i].address;
-    $('.team:eq('+i+')').data('team-address', teamAddress);
+    const teamName = response.teams[i].name;
+    $('.team:eq('+i+')').data('team-name', teamName);
     $('.team:eq('+i+')').data('team-id', teamId);
     $('.team:eq('+i+') img').attr('src', response.teams[i].crestUrl);
     $('.team:eq('+i+')').append(`<h3>${response.teams[i].name}</h3>`);
@@ -147,9 +147,11 @@ function makeIconDivs(weatherChoices) {
 
 
 let LeagueMatches = [];
+let TeamName = '';
 function getMatches() {
   $('.team').on('click', function() {
     const teamId = $(this).data('team-id');
+    TeamName = $(this).data('team-name');
     fetchAllTeamMatches(teamId).then(data => {
       LeagueMatches = getPLTeamMatchesData(data);
       console.log(LeagueMatches);
@@ -175,13 +177,15 @@ function getPickedWeatherDates(allWeather) {
 }
 function getMatchesFromWeatherDates(pickedWeatherDates, leagueMatches, weatherPicked) {
   const weatherMatchedMatches = [];
+  const recordObj = {'wins': 0, 'losses': 0, 'draws': 0};
   console.log(leagueMatches);
   leagueMatches.forEach(match => {
     const mDate = new Date(match.utcDate).getTime();
     console.log(mDate);
     console.log(pickedWeatherDates[0]);
-    for(let i = 0; i<pickedWeatherDates.length; i++) {
+    for (let i = 0; i<pickedWeatherDates.length; i++) {
       if (mDate == pickedWeatherDates[i]) {
+        winLossCounter(match.homeTeam.name, match.awayTeam.name, match.score.winner, recordObj);
         console.log('dates equal');
         weatherMatchedMatches.push({
           'homeTeam': match.homeTeam.name,
@@ -190,16 +194,31 @@ function getMatchesFromWeatherDates(pickedWeatherDates, leagueMatches, weatherPi
       }
     }
   });
-  displayWeatherMatchedMatches(weatherMatchedMatches, weatherPicked);
+  displayWeatherMatchedMatches(weatherMatchedMatches, weatherPicked, recordObj);
 }
-function displayWeatherMatchedMatches(weatherMatchedMatches, weatherPicked) {
-  $('.selections__header').html(`Results for ${weatherPicked}`);
+function winLossCounter(homeTeam, awayTeam, winner, obj) {
+  if(homeTeam === TeamName && winner === 'HOME_TEAM') {
+    obj.wins++;
+  } else if (awayTeam === TeamName && winner ==='AWAY_TEAM') {
+    obj.wins++;
+  } else if (homeTeam === TeamName && winner === 'AWAY_TEAM') {
+    obj.losses++;
+  } else if (awayTeam === TeamName && winner === 'HOME_TEAM') {
+    obj.losses++;
+  } else {
+    obj.draws++;
+  }
+  return obj;
+}
+function displayWeatherMatchedMatches(weatherMatchedMatches, weatherPicked, record) {
+  $('.selections__header').html(`Results for ${TeamName} playing in ${weatherPicked} weather`).after(
+      `<h3>Record: ${record.wins}-${record.losses}-${record.draws}</h3>`);
   $('.weathers').hide();
   weatherMatchedMatches.forEach(match => {
     $('.results').append(
         `<div class="result">
-          <h3>Home Team: ${match.homeTeam} Score: ${match.score.homeTeam}</h3>
-          <h3>Away Team: ${match.awayTeam} Score: ${match.score.awayTeam}</h3>
+          <h4>Home Team: ${match.homeTeam} Score: ${match.score.homeTeam}</h4>
+          <h4>Away Team: ${match.awayTeam} Score: ${match.score.awayTeam}</h4>
         </div>`);
   });
 }
