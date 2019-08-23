@@ -7,9 +7,9 @@ function fetchLeagueTeams() {
       {headers: {'X-Auth-Token': '42b54b95666e4b969e41a0e7361afe71'}})
       .then((response) => {
         response.json().then(response => {
-          console.log(response);
           addTeamsToDom(response);
           handleTeamClick();
+          getMatches();
         });
       });
 }
@@ -28,13 +28,15 @@ function handleTeamClick() {
   $('.team').on('click', function() {
     const teamId = $(this).data('team-id');
     hideAllTeams();
-    changeToWeatherOptions(teamId)
+    $('.selections__header').html('Select a weather condition');
+    changeToWeatherOptions(teamId);
   });
 }
 
 function changeToWeatherOptions(teamId) {
   fetchAllTeamMatches(teamId).then(data => {
-    // getPLTeamMatchesData(data);
+    // const leagueMatches = getPLTeamMatchesData(data)
+    // console.log(leagueMatches);
     return getLocationDate(data);
     // determine and show weather icons
   }).then(weatherCallParams => {
@@ -106,34 +108,103 @@ function returnWeatherPromise(paramsArr, i) {
 }
 
 function getWeathersData(paramsArr) {
-  const weathersArr = [];
+  const weathersPromArr = [];
   const weatherChoices = new Set();
+  const allWeather = [];
   for (let i=0; i < paramsArr.length; i++) {
-    weathersArr.push(returnWeatherPromise(paramsArr, i));
+    weathersPromArr.push(returnWeatherPromise(paramsArr, i));
   }
-  Promise.all(weathersArr).then(arr => {
+  Promise.all(weathersPromArr).then(arr => {
     const promArr = [];
     arr.forEach(item => {
       promArr.push(item.json());
     });
     Promise.all(promArr).then(data => {
+      console.log(data);
       data.forEach(item => {
         weatherChoices.add(item.currently.icon);
+        allWeather.push(item.currently);
       });
+      console.log(allWeather);
       makeIconDivs(weatherChoices);
+      getPickedWeatherDates(allWeather);
     });
   });
 }
 function makeIconDivs(weatherChoices) {
   console.log(weatherChoices);
   weatherChoices.forEach(function(icon) {
-    console.log(icon);
-    $('.weathers').append(`<div class="weather ${icon}">
-                            <i class="wi wi-forecast-io-${icon} alt="${icon}"/></i>
+    $('.weathers').append(`<div class="weather">
+                            <i class="wi wi-forecast-io-${icon}" alt="${icon}"/></i>
                               <p>${icon}</p>
                           </div>`);
   });
 }
+
+
+
+
+
+
+let LeagueMatches = [];
+function getMatches() {
+  $('.team').on('click', function() {
+    const teamId = $(this).data('team-id');
+    fetchAllTeamMatches(teamId).then(data => {
+      LeagueMatches = getPLTeamMatchesData(data);
+      console.log(LeagueMatches);
+      return LeagueMatches;
+    });
+  });
+}
+function getPickedWeatherDates(allWeather) {
+  const pickedWeatherDates = [];
+  $('.weathers').on('click', '.weather', function() {
+    const weatherPicked = $(this).children().attr('alt');
+    console.log(weatherPicked);
+    allWeather.forEach(item => {
+      if (weatherPicked === item.icon) {
+        const date = new Date(item.time*1000).getTime();
+        pickedWeatherDates.push(date);
+      }
+    });
+    console.log(pickedWeatherDates);
+    console.log(LeagueMatches);
+    getMatchesFromWeatherDates(pickedWeatherDates, LeagueMatches, weatherPicked);
+  });
+}
+function getMatchesFromWeatherDates(pickedWeatherDates, leagueMatches, weatherPicked) {
+  const weatherMatchedMatches = [];
+  console.log(leagueMatches);
+  leagueMatches.forEach(match => {
+    const mDate = new Date(match.utcDate).getTime();
+    console.log(mDate);
+    console.log(pickedWeatherDates[0]);
+    for(let i = 0; i<pickedWeatherDates.length; i++) {
+      if (mDate == pickedWeatherDates[i]) {
+        console.log('dates equal');
+        weatherMatchedMatches.push({
+          'homeTeam': match.homeTeam.name,
+          'awayTeam': match.awayTeam.name,
+          'score': match.score.fullTime});
+      }
+    }
+  });
+  displayWeatherMatchedMatches(weatherMatchedMatches, weatherPicked);
+}
+function displayWeatherMatchedMatches(weatherMatchedMatches, weatherPicked) {
+  $('.selections__header').html(`Results for ${weatherPicked}`);
+  $('.weathers').hide();
+  weatherMatchedMatches.forEach(match => {
+    $('.results').append(
+        `<div class="result">
+          <h3>Home Team: ${match.homeTeam} Score: ${match.score.homeTeam}</h3>
+          <h3>Away Team: ${match.awayTeam} Score: ${match.score.awayTeam}</h3>
+        </div>`);
+  });
+}
+
+
 
 const latLong = [
   {'team': 'Arsenal FC',
