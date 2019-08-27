@@ -11,6 +11,9 @@ function fetchLeagueTeams() {
           handleTeamClick();
           getMatches();
         });
+      }).catch(error => {
+        console.log(error);
+        $('.teams').append(`<p>Unfortunately the API failed and the teams didn't load. Please refresh to try again.</p>`);
       });
 }
 function addTeamsToDom(response) {
@@ -19,9 +22,14 @@ function addTeamsToDom(response) {
     const teamName = response.teams[i].name;
     $('.team:eq('+i+')').data('team-name', teamName);
     $('.team:eq('+i+')').data('team-id', teamId);
-    $('.team:eq('+i+') img').attr('src', response.teams[i].crestUrl);
+    if (!$('.team:eq('+i+') img').attr('src')) {
+      $('.team:eq('+i+') img').attr('src', response.teams[i].crestUrl);
+    }
     $('.team:eq('+i+')').append(`<h3>${response.teams[i].name}</h3>`);
   }
+  $('.team img').on('load', () => {
+    $('.team').css('display', 'flex');
+  });
 }
 
 function handleTeamClick() {
@@ -62,8 +70,9 @@ function fetchAllTeamMatches(teamId) {
         const rJ = response.json();
         console.log(rJ);
         return rJ;
-      }).catch( e => {
-        console.error(e);
+      }).catch(error => {
+        console.log(error);
+        $('.teams').append(`<p>Unfortunately the API failed and the matches didn't load. Please refresh to try again.</p>`);
       });
 }
 
@@ -178,14 +187,14 @@ function getPickedWeatherDates(allWeather) {
 function getMatchesFromWeatherDates(pickedWeatherDates, leagueMatches, weatherPicked) {
   const weatherMatchedMatches = [];
   const recordObj = {'wins': 0, 'losses': 0, 'draws': 0};
+  const goalsObj = {'goalsFor': 0, 'goalsAgainst': 0}
   console.log(leagueMatches);
   leagueMatches.forEach(match => {
     const mDate = new Date(match.utcDate).getTime();
-    console.log(mDate);
-    console.log(pickedWeatherDates[0]);
     for (let i = 0; i<pickedWeatherDates.length; i++) {
       if (mDate == pickedWeatherDates[i]) {
         winLossCounter(match.homeTeam.name, match.awayTeam.name, match.score.winner, recordObj);
+        goalsCounter(match, goalsObj);
         console.log('dates equal');
         weatherMatchedMatches.push({
           'homeTeam': match.homeTeam.name,
@@ -194,7 +203,7 @@ function getMatchesFromWeatherDates(pickedWeatherDates, leagueMatches, weatherPi
       }
     }
   });
-  displayWeatherMatchedMatches(weatherMatchedMatches, weatherPicked, recordObj);
+  displayWeatherMatchedMatches(weatherMatchedMatches, weatherPicked, recordObj, goalsObj);
 }
 function winLossCounter(homeTeam, awayTeam, winner, obj) {
   if(homeTeam === TeamName && winner === 'HOME_TEAM') {
@@ -210,15 +219,27 @@ function winLossCounter(homeTeam, awayTeam, winner, obj) {
   }
   return obj;
 }
-function displayWeatherMatchedMatches(weatherMatchedMatches, weatherPicked, record) {
+function goalsCounter(match, goalsObj) {
+  console.log(match.homeTeam.name + ' & ' + TeamName);
+  if (match.homeTeam.name === TeamName) {
+    goalsObj.goalsFor =+ match.score.fullTime.homeTeam;
+    goalsObj.goalsAgainst =+ match.score.fullTime.awayTeam;
+  } else {
+    goalsObj.goalsAgainst =+ match.score.fullTime.homeTeam;
+    goalsObj.goalsFor =+ match.score.fullTime.awayTeam;
+  }
+}
+function displayWeatherMatchedMatches(weatherMatchedMatches, weatherPicked, record, goals) {
   $('.selections__header').html(`Results for ${TeamName} playing in ${weatherPicked} weather`).after(
-      `<h3>Record: ${record.wins}-${record.losses}-${record.draws}</h3>`);
+      `<h3>Record: ${record.wins}-${record.losses}-${record.draws}</h3>
+      <h3>Total Goals For: ${goals.goalsFor}</h3>
+      <h3>Total Goals Against: ${goals.goalsAgainst}</h3>`);
   $('.weathers').hide();
   weatherMatchedMatches.forEach(match => {
     $('.results').append(
         `<div class="result">
-          <h4>Home Team: ${match.homeTeam} Score: ${match.score.homeTeam}</h4>
-          <h4>Away Team: ${match.awayTeam} Score: ${match.score.awayTeam}</h4>
+          <h4>${match.homeTeam} Score: ${match.score.homeTeam}</h4>
+          <h4>${match.awayTeam} Score: ${match.score.awayTeam}</h4>
         </div>`);
   });
 }

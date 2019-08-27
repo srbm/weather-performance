@@ -9,11 +9,21 @@ $epl-purple: #38003c;
 *, body {
     box-sizing: border-box;
 }
+body {
+    min-height: 100%;
+    position: relative;
+}
+main {
+    padding-bottom: 270px;
+}
 
 h1 {
     font-size: 36px;
     color: $epl-purple;
     font-family: sans-serif;
+}
+p {
+    font-size: 22px;
 }
 
 .header {
@@ -38,9 +48,10 @@ h1 {
         flex-basis: 50%;
         margin: 2.5em auto 1em;
     }
-    h2, p {
-        width: 250px;
+    p {
+        width: 350px;
         margin: .5em auto 0;
+        color: $epl-purple;
     }
 }
 section:first-child {
@@ -67,10 +78,9 @@ section:first-child {
     flex-wrap: wrap;
     justify-content: center;
     .team {
-        display: flex;
+        display: none;
         flex-direction: column;
         justify-content: space-between;
-        // width: 150px;
         border: 2px solid black;
         border-radius: 3px;
         margin: 1em .5em; 
@@ -84,6 +94,7 @@ section:first-child {
         }
         img {
             height: 170px;
+            width: auto;
         }
         h3 {
             margin-top: .5em;
@@ -128,5 +139,10 @@ section:first-child {
 }
 footer {
     margin: 3em 0 2em;
+    height: 100px;
+    width: 100%;
+    position: absolute;
+    bottom: 0;
     text-align: center;
+
 }
