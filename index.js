@@ -2,18 +2,21 @@
 /* eslint-disable no-invalid-this */
 'use strict';
 
-function fetchLeagueTeams() {
-  fetch(`https://api.football-data.org/v2/competitions/PL/teams?season=2018`,
-      {headers: {'X-Auth-Token': '42b54b95666e4b969e41a0e7361afe71'}})
-      .then((response) => {
-        response.json().then(response => {
-          addTeamsToDom(response);
-          handleTeamClick();
-          getMatches();
-        });
-      }).catch(error => {
-        console.log(error);
-        $('.teams').append(`<p>Unfortunately the API failed and the teams didn't load. Please refresh to try again.</p>`);
+let LeagueMatches = [];
+let TeamName = '';
+
+function watchInitialPage() {
+  fetchLeagueTeams()
+      .then(handleFetchResponse)
+      .then(json => {
+        addTeamsToDom(json);
+        watchTeamClick();
+        toggleSpinner();
+      })
+      .catch(e => {
+        console.log(e + ' line 42');
+        $('.errors').append(`<p>The request failed. ${e}</p>`);
+        toggleSpinner();
       });
 }
 function addTeamsToDom(response) {
@@ -31,95 +34,92 @@ function addTeamsToDom(response) {
     $('.team').css('display', 'flex');
   });
 }
-
-function handleTeamClick() {
+function watchTeamClick() {
   $('.team').on('click', function() {
     const teamId = $(this).data('team-id');
-    hideAllTeams();
-    $('.selections__header').html('Select a weather condition');
-    changeToWeatherOptions(teamId);
+    TeamName = $(this).data('team-name');
+    handleTeamClick(teamId);
+    getMatches(teamId);
   });
 }
-
-function changeToWeatherOptions(teamId) {
-  fetchAllTeamMatches(teamId).then(data => {
-    // const leagueMatches = getPLTeamMatchesData(data)
-    // console.log(leagueMatches);
-    return getLocationDate(data);
-    // determine and show weather icons
-  }).then(weatherCallParams => {
-    return getWeathersData(weatherCallParams);
-  }).catch(err => console.log(err));
+function handleTeamClick(teamId) {
+  hideAllTeams();
+  $('.selections__header').html('Select a weather condition');
+  changeToWeatherOptions(teamId);
 }
-
-function getLocationDate(data) {
-  const weatherCallParams = [];
-  const matches = getGameHomeTeam(getPLTeamMatchesData(data));
-  makeWeatherCallParamsObj(getPLTeamMatchesData(data), matches, weatherCallParams);
-  console.log(weatherCallParams);
-  return weatherCallParams;
-}
-
-function fetchAllTeamMatches(teamId) {
-  return fetch(`https://api.football-data.org/v2/teams/${teamId}/matches?dateFrom=2018-08-10&dateTo=2019-05-12`,
-      {headers: {'X-Auth-Token': '42b54b95666e4b969e41a0e7361afe71'}})
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error ("fetch team matches unsuccessful");
-        }
-        const rJ = response.json();
-        console.log(rJ);
-        return rJ;
-      }).catch(error => {
-        console.log(error);
-        $('.teams').append(`<p>Unfortunately the API failed and the matches didn't load. Please refresh to try again.</p>`);
+function getMatches(teamId) {
+  fetchAllTeamMatches(teamId)
+      .then(handleFetchResponse)
+      .then(data => {
+        LeagueMatches = getPLTeamMatchesData(data);
+        return LeagueMatches;
       });
 }
 
-function getPLTeamMatchesData(data) {
-  const PLMatches = [];
-  for (let i = 0; i<data.count; i++) {
-    if (data.matches[i].competition.name === "Premier League") {
-      PLMatches.push(data.matches[i]);
-    }
-  }
-  return (PLMatches);
+function changeToWeatherOptions(teamId) {
+  toggleSpinner();
+  fetchAllTeamMatches(teamId)
+      .then(handleFetchResponse)
+      .then(getWeatherCallParams)
+      .then(getWeatherData)
+      .catch(err => {
+        console.log(err + ' changeToWeatherOptions')
+        $('.weathers').append(`
+            <p>Unfortunately the request has failed and the matches didn't load.
+             Please refresh to try again.</p>`);
+             toggleSpinner();
+      });
 }
-
+function getWeatherCallParams(data) {
+  const weatherCallsParams = [];
+  const leageMatches = getPLTeamMatchesData(data);
+  const homeTeamPerMatch = getGameHomeTeam(leageMatches);
+  makeWeatherCallParamsObj(leageMatches, homeTeamPerMatch, weatherCallsParams);
+  return weatherCallsParams;
+}
 function getGameHomeTeam(matches) {
-  const location = [];
+  const homeTeams = [];
   matches.forEach( ele => {
-    location.push(ele.homeTeam);
+    homeTeams.push(ele.homeTeam);
   });
-  return location;
+  return homeTeams;
 }
-
-function hideAllTeams() {
-  $('.teams').hide();
-}
-
-function makeWeatherCallParamsObj(matches, homeTeamArr, WCObj) {
-  for (let i=0; i<homeTeamArr.length; i++) {
-    latLong.forEach( (j) => {
-      if (homeTeamArr[i].name === j.team) {
-        WCObj.push({
+function makeWeatherCallParamsObj(matches, homeTeamsArr, weatherCallsParams) {
+  for (let i=0; i<homeTeamsArr.length; i++) {
+    GlobalLatLong.forEach( obj => {
+      if (homeTeamsArr[i].name === obj.team) {
+        weatherCallsParams.push({
           'utcDate': matches[i].utcDate,
-          'lat': j.lat,
-          'long': j.long
+          'lat': obj.lat,
+          'long': obj.long,
         });
       }
     });
   }
 }
 
-function returnWeatherPromise(paramsArr, i) {
-  return fetch(`https://cors-anywhere.herokuapp.com/https://api.darksky.net/forecast/9f2b441e09bacb0213aaa8eab1f74725/${paramsArr[i].lat},${paramsArr[i].long},${paramsArr[i].utcDate}`);
+
+
+function getPLTeamMatchesData(data) {
+  const PLMatches = [];
+  // const totalRecordObj = {'wins': 0, 'losses': 0, 'draws': 0};
+  for (let i = 0; i<data.count; i++) {
+    if (data.matches[i].competition.name === "Premier League") {
+      PLMatches.push(data.matches[i]);
+      // winLossCounter(data.matches[i].homeTeam.name, data.matches[i].awayTeam.name, data.matches[i].score.winner, totalRecordObj);
+      // console.log(PLMatches);
+    }
+  }
+  console.log(PLMatches);
+  return (PLMatches);
 }
 
-function getWeathersData(paramsArr) {
+
+
+function getWeatherData(paramsArr) {
   const weathersPromArr = [];
   const weatherChoices = new Set();
-  const allWeather = [];
+  const weatherPerGame = [];
   for (let i=0; i < paramsArr.length; i++) {
     weathersPromArr.push(returnWeatherPromise(paramsArr, i));
   }
@@ -129,18 +129,25 @@ function getWeathersData(paramsArr) {
       promArr.push(item.json());
     });
     Promise.all(promArr).then(data => {
-      console.log(data);
       data.forEach(item => {
         weatherChoices.add(item.currently.icon);
-        allWeather.push(item.currently);
+        weatherPerGame.push(item.currently);
       });
-      console.log(allWeather);
-      makeIconDivs(weatherChoices);
-      getPickedWeatherDates(allWeather);
+      displayIconDivs(weatherChoices);
+      console.log(weatherPerGame);
+      watchWeatherPicked(weatherPerGame);
+      // getPickedWeatherDates(allWeather);
+      toggleSpinner();
+    }).catch(e => {
+      console.log(e + ' inside Promise');
+      $('.weathers').append(`<p>Sorry, the request has failed. Please wait a minute and refresh to try again.</p>`)
     });
+  }).catch(e => {
+    console.log(e + ' outside Promise');
+    $('.weathers').append(`<p>Sorry, the API failed. Please wait a minute and refresh to try again.</p>`)
   });
 }
-function makeIconDivs(weatherChoices) {
+function displayIconDivs(weatherChoices) {
   console.log(weatherChoices);
   weatherChoices.forEach(function(icon) {
     $('.weathers').append(`<div class="weather">
@@ -149,51 +156,33 @@ function makeIconDivs(weatherChoices) {
                           </div>`);
   });
 }
-
-
-
-
-
-
-let LeagueMatches = [];
-let TeamName = '';
-function getMatches() {
-  $('.team').on('click', function() {
-    const teamId = $(this).data('team-id');
-    TeamName = $(this).data('team-name');
-    fetchAllTeamMatches(teamId).then(data => {
-      LeagueMatches = getPLTeamMatchesData(data);
-      console.log(LeagueMatches);
-      return LeagueMatches;
-    });
-  });
-}
-function getPickedWeatherDates(allWeather) {
-  const pickedWeatherDates = [];
+function watchWeatherPicked(allWeather) {
   $('.weathers').on('click', '.weather', function() {
     const weatherPicked = $(this).children().attr('alt');
-    console.log(weatherPicked);
-    allWeather.forEach(item => {
-      if (weatherPicked === item.icon) {
-        const date = new Date(item.time*1000).getTime();
-        pickedWeatherDates.push(date);
-      }
-    });
-    console.log(pickedWeatherDates);
-    console.log(LeagueMatches);
+    const pickedWeatherDates = getPickedWeatherDates(allWeather, weatherPicked);
     getMatchesFromWeatherDates(pickedWeatherDates, LeagueMatches, weatherPicked);
   });
 }
+function getPickedWeatherDates(allWeather, weatherPicked) {
+  const pickedWeatherDates = [];
+  console.log(weatherPicked);
+  allWeather.forEach(item => {
+    if (weatherPicked === item.icon) {
+      const date = new Date(item.time*1000).getTime();
+      pickedWeatherDates.push(date);
+    }
+  });
+  return pickedWeatherDates;
+}
 function getMatchesFromWeatherDates(pickedWeatherDates, leagueMatches, weatherPicked) {
   const weatherMatchedMatches = [];
-  const recordObj = {'wins': 0, 'losses': 0, 'draws': 0};
+  const weatherRecordObj = {'wins': 0, 'losses': 0, 'draws': 0};
   const goalsObj = {'goalsFor': 0, 'goalsAgainst': 0}
-  console.log(leagueMatches);
   leagueMatches.forEach(match => {
     const mDate = new Date(match.utcDate).getTime();
     for (let i = 0; i<pickedWeatherDates.length; i++) {
       if (mDate == pickedWeatherDates[i]) {
-        winLossCounter(match.homeTeam.name, match.awayTeam.name, match.score.winner, recordObj);
+        winLossCounter(match.homeTeam.name, match.awayTeam.name, match.score.winner, weatherRecordObj);
         goalsCounter(match, goalsObj);
         console.log('dates equal');
         weatherMatchedMatches.push({
@@ -203,7 +192,7 @@ function getMatchesFromWeatherDates(pickedWeatherDates, leagueMatches, weatherPi
       }
     }
   });
-  displayWeatherMatchedMatches(weatherMatchedMatches, weatherPicked, recordObj, goalsObj);
+  displayWeatherMatchedResults(weatherMatchedMatches, weatherPicked, weatherRecordObj, goalsObj);
 }
 function winLossCounter(homeTeam, awayTeam, winner, obj) {
   if(homeTeam === TeamName && winner === 'HOME_TEAM') {
@@ -220,16 +209,15 @@ function winLossCounter(homeTeam, awayTeam, winner, obj) {
   return obj;
 }
 function goalsCounter(match, goalsObj) {
-  console.log(match.homeTeam.name + ' & ' + TeamName);
   if (match.homeTeam.name === TeamName) {
-    goalsObj.goalsFor =+ match.score.fullTime.homeTeam;
-    goalsObj.goalsAgainst =+ match.score.fullTime.awayTeam;
+    goalsObj.goalsFor += match.score.fullTime.homeTeam;
+    goalsObj.goalsAgainst += match.score.fullTime.awayTeam;
   } else {
-    goalsObj.goalsAgainst =+ match.score.fullTime.homeTeam;
-    goalsObj.goalsFor =+ match.score.fullTime.awayTeam;
+    goalsObj.goalsAgainst += match.score.fullTime.homeTeam;
+    goalsObj.goalsFor += match.score.fullTime.awayTeam;
   }
 }
-function displayWeatherMatchedMatches(weatherMatchedMatches, weatherPicked, record, goals) {
+function displayWeatherMatchedResults(weatherMatchedMatches, weatherPicked, record, goals, weatherRecord) {
   $('.selections__header').html(`Results for ${TeamName} playing in ${weatherPicked} weather`).after(
       `<h3>Record: ${record.wins}-${record.losses}-${record.draws}</h3>
       <h3>Total Goals For: ${goals.goalsFor}</h3>
@@ -246,7 +234,46 @@ function displayWeatherMatchedMatches(weatherMatchedMatches, weatherPicked, reco
 
 
 
-const latLong = [
+
+
+
+
+// Fetch
+function fetchLeagueTeams() {
+  return fetch(`https://api.football-data.org/v2/competitions/PL/teams?season=2018`,
+      {headers: {'X-Auth-Token': '42b54b95666e4b969e41a0e7361afe71',
+      }});
+}
+function fetchAllTeamMatches(teamId) {
+  return fetch(`https://api.football-data.org/v2/teams/${teamId}/matches?dateFrom=2018-08-10&dateTo=2019-05-12`,
+      {headers: {'X-Auth-Token': '42b54b95666e4b969e41a0e7361afe71'}});
+}
+function returnWeatherPromise(paramsArr, i) {
+  return fetch(`https://cors-anywhere.herokuapp.com/https://api.darksky.net/forecast/9f2b441e09bacb0213aaa8eab1f74725/${paramsArr[i].lat},${paramsArr[i].long},${paramsArr[i].utcDate}`);
+}
+function handleFetchResponse(fetchedPromise) {
+  return fetchedPromise.json()
+      .then(json => {
+        if (!fetchedPromise.ok) {
+          const error = Object.assign({}, json, {
+            status: fetchedPromise.status,
+            statusText: fetchedPromise.statusText,
+          });
+          return Promise.reject(error);
+        } else {
+          return json;
+        }
+      });
+}
+
+function toggleSpinner() {
+  $('.lds-spinner').toggle();
+}
+function hideAllTeams() {
+  $('.teams').hide();
+}
+
+const GlobalLatLong = [
   {'team': 'Arsenal FC',
     'lat': 51.555089,
     'long': -0.107891},
@@ -309,4 +336,4 @@ const latLong = [
     'long': -1.838276},
 ];
 
-$(fetchLeagueTeams);
+$(watchInitialPage);

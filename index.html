@@ -13,14 +13,16 @@
             <h1 class="header__headline">Weather Performance</h1>
             <div class="header__text">
                 <p>How good is your team...in the snow?</p>
-                <p>Select a team.</p>
-                <p>Select a weather condition.</p>
+                <p>Pick a team.</p>
+                <p>Pick a weather condition.</p>
                 <p>Get the results.</p>
             </div>
         </header>
         <main>
             <section class="selections">
                 <h2 class="selections__header">Select a team.</h2>
+                <div class="errors"></div>
+                <div class="lds-spinner"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>
                 <div class="teams">
                     <div class="team">
                         <img src="">
@@ -90,6 +92,7 @@
             </section>
         </main>
         <footer>
+            <p><a href="https://github.com/srbm/weather-performance">GitHub Repo</a></p>
             <p><a href="https://darksky.net/poweredby">Powered by Dark Sky</a></p>
         </footer>
         <script
