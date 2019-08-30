@@ -52,7 +52,6 @@ function getMatches(teamId) {
       .then(handleFetchResponse)
       .then(data => {
         LeagueMatches = getPLTeamMatchesData(data);
-        return LeagueMatches;
       });
 }
 
@@ -177,13 +176,17 @@ function getPickedWeatherDates(allWeather, weatherPicked) {
 function getMatchesFromWeatherDates(pickedWeatherDates, leagueMatches, weatherPicked) {
   const weatherMatchedMatches = [];
   const weatherRecordObj = {'wins': 0, 'losses': 0, 'draws': 0};
-  const goalsObj = {'goalsFor': 0, 'goalsAgainst': 0}
+  const totalRecordObj = {'wins': 0, 'losses': 0, 'draws': 0};
+  const totalGoals = {'goalsFor': 0, 'goalsAgainst': 0};
+  const weatherGoals = {'goalsFor': 0, 'goalsAgainst': 0}
   leagueMatches.forEach(match => {
+    winLossCounter(match.homeTeam.name, match.awayTeam.name, match.score.winner, totalRecordObj);
+    goalsCounter(match, totalGoals);
     const mDate = new Date(match.utcDate).getTime();
     for (let i = 0; i<pickedWeatherDates.length; i++) {
       if (mDate == pickedWeatherDates[i]) {
         winLossCounter(match.homeTeam.name, match.awayTeam.name, match.score.winner, weatherRecordObj);
-        goalsCounter(match, goalsObj);
+        goalsCounter(match, weatherGoals);
         console.log('dates equal');
         weatherMatchedMatches.push({
           'homeTeam': match.homeTeam.name,
@@ -192,7 +195,7 @@ function getMatchesFromWeatherDates(pickedWeatherDates, leagueMatches, weatherPi
       }
     }
   });
-  displayWeatherMatchedResults(weatherMatchedMatches, weatherPicked, weatherRecordObj, goalsObj);
+  displayWeatherMatchedResults(weatherMatchedMatches, weatherPicked, totalRecordObj, totalGoals, weatherRecordObj, weatherGoals);
 }
 function winLossCounter(homeTeam, awayTeam, winner, obj) {
   if(homeTeam === TeamName && winner === 'HOME_TEAM') {
@@ -217,19 +220,35 @@ function goalsCounter(match, goalsObj) {
     goalsObj.goalsFor += match.score.fullTime.awayTeam;
   }
 }
-function displayWeatherMatchedResults(weatherMatchedMatches, weatherPicked, record, goals, weatherRecord) {
-  $('.selections__header').html(`Results for ${TeamName} playing in ${weatherPicked} weather`).after(
-      `<h3>Record: ${record.wins}-${record.losses}-${record.draws}</h3>
-      <h3>Total Goals For: ${goals.goalsFor}</h3>
-      <h3>Total Goals Against: ${goals.goalsAgainst}</h3>`);
+function displayWeatherMatchedResults(weatherMatchedMatches, weatherPicked, record, totalGoals, weatherRecord, weatherGoals) {
+  $('.selections__header').html(`Results for ${TeamName} playing in ${weatherPicked} weather`);$('.results').append(
+      `<div class="results__season">
+        <h2>Season Stats</h2>
+        <h3>Record: ${record.wins}-${record.losses}-${record.draws}</h3>
+        <h3>Win percent: ${(record.wins / (record.wins + record.losses + record.draws)).toFixed(3)}</h3>
+        <h3>Goals For: ${totalGoals.goalsFor}</h3>
+        <h3>Goals For/Game: ${(totalGoals.goalsFor / (record.wins + record.losses + record.draws)).toFixed(2)}</h3>
+        <h3>Goals Against: ${totalGoals.goalsAgainst}</h3>
+        <h3>Goals Against/Game ${(totalGoals.goalsAgainst / (record.wins + record.losses + record.draws)).toFixed(2)}</h3>
+      </div>
+      <div class="results__weather">
+        <h2>Weather Stats</h2>
+        <h3>Record: ${weatherRecord.wins}-${weatherRecord.losses}-${weatherRecord.draws}</h3>
+        <h3>Win percent: ${(weatherRecord.wins / (weatherRecord.wins + weatherRecord.losses + weatherRecord.draws)).toFixed(3)}</h3>
+        <h3>Goals For: ${weatherGoals.goalsFor}</h3>
+        <h3>Goals For/Game: ${(weatherGoals.goalsFor / (record.wins + record.losses + record.draws)).toFixed(2)}</h3>
+        <h3>Goals Against: ${weatherGoals.goalsAgainst}</h3>
+        <h3>Goals Against/Game ${(weatherGoals.goalsAgainst / (record.wins + record.losses + record.draws)).toFixed(2)}</h3>
+      </div>`);
   $('.weathers').hide();
-  weatherMatchedMatches.forEach(match => {
-    $('.results').append(
-        `<div class="result">
-          <h4>${match.homeTeam} Score: ${match.score.homeTeam}</h4>
-          <h4>${match.awayTeam} Score: ${match.score.awayTeam}</h4>
-        </div>`);
-  });
+  // Individual Game Results
+  // weatherMatchedMatches.forEach(match => {
+  //   $('.results').append(
+  //       `<div class="result">
+  //         <h4>${match.homeTeam} Score: ${match.score.homeTeam}</h4>
+  //         <h4>${match.awayTeam} Score: ${match.score.awayTeam}</h4>
+  //       </div>`);
+  // });
 }
 
 
@@ -238,7 +257,6 @@ function displayWeatherMatchedResults(weatherMatchedMatches, weatherPicked, reco
 
 
 
-// Fetch
 function fetchLeagueTeams() {
   return fetch(`https://api.football-data.org/v2/competitions/PL/teams?season=2018`,
       {headers: {'X-Auth-Token': '42b54b95666e4b969e41a0e7361afe71',

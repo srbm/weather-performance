@@ -100,7 +100,8 @@ section:first-child {
 .results {
   display: flex;
   flex-wrap: wrap;
-  justify-content: space-evenly; }
+  justify-content: space-evenly;
+  text-align: left; }
   .results .result {
     border-bottom: 2px solid black;
     margin: 20px 30px;

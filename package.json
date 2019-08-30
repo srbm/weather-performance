@@ -24,7 +24,7 @@
   },
   "homepage": "https://github.com/srbm/weather-performance#readme",
   "devDependencies": {
-    "eslint": "^6.1.0",
+    "eslint": "^6.2.2",
     "eslint-config-google": "^0.13.0"
   }
 }
