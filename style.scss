@@ -64,7 +64,7 @@ section:first-child {
 }
 .selections {
     .selections__header {
-        margin-bottom: 20px;
+        margin-bottom: 1.5em;
     }
     h3 {
         font-size: 24px;
@@ -84,7 +84,8 @@ section:first-child {
         border: 2px solid black;
         border-radius: 3px;
         margin: 1em .5em; 
-        padding: .7em;
+        padding: 1em;
+        max-width: 225px;
         transition: .4s;
         object-fit: contain;
         cursor: pointer;

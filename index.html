@@ -12,7 +12,7 @@
             <img class="header__logo" src="images/premier-league.png" alt="Premiere League">
             <h1 class="header__headline">Weather Performance</h1>
             <div class="header__text">
-                <p>How good is your team...in the snow?</p>
+                <p>How good is your team...in the rain?</p>
                 <p>Pick a team.</p>
                 <p>Pick a weather condition.</p>
                 <p>Get the results.</p>
@@ -23,7 +23,7 @@
                 <h2 class="selections__header">Select a team.</h2>
                 <div class="errors"></div>
                 <div class="lds-spinner"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>
-                <div class="teams">
+                <div class="teams" aria-live="polite">
                     <div class="team">
                         <img src="">
                     </div>
@@ -85,9 +85,9 @@
                         <img src="">
                     </div>
                 </div>
-                <div class="weathers">
+                <div class="weathers" aria-live="polite">
                 </div>
-                <div class="results">
+                <div class="results" aria-live="polite">
                 </div>
             </section>
         </main>

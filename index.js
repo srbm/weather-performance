@@ -2,8 +2,11 @@
 /* eslint-disable no-invalid-this */
 'use strict';
 
-let LeagueMatches = [];
-let TeamName = '';
+let appState = {
+  'LeagueMatches' : [],
+  'TeamName' : '',
+};
+
 
 function watchInitialPage() {
   fetchLeagueTeams()
@@ -37,7 +40,7 @@ function addTeamsToDom(response) {
 function watchTeamClick() {
   $('.team').on('click', function() {
     const teamId = $(this).data('team-id');
-    TeamName = $(this).data('team-name');
+    appState.TeamName = $(this).data('team-name');
     handleTeamClick(teamId);
     getMatches(teamId);
   });
@@ -51,7 +54,7 @@ function getMatches(teamId) {
   fetchAllTeamMatches(teamId)
       .then(handleFetchResponse)
       .then(data => {
-        LeagueMatches = getPLTeamMatchesData(data);
+        appState.LeagueMatches = getPLTeamMatchesData(data);
       });
 }
 
@@ -71,9 +74,9 @@ function changeToWeatherOptions(teamId) {
 }
 function getWeatherCallParams(data) {
   const weatherCallsParams = [];
-  const leageMatches = getPLTeamMatchesData(data);
-  const homeTeamPerMatch = getGameHomeTeam(leageMatches);
-  makeWeatherCallParamsObj(leageMatches, homeTeamPerMatch, weatherCallsParams);
+  const leagueMatches = getPLTeamMatchesData(data);
+  const homeTeamPerMatch = getGameHomeTeam(leagueMatches);
+  makeWeatherCallParamsObj(leagueMatches, homeTeamPerMatch, weatherCallsParams);
   return weatherCallsParams;
 }
 function getGameHomeTeam(matches) {
@@ -138,12 +141,14 @@ function getWeatherData(paramsArr) {
       // getPickedWeatherDates(allWeather);
       toggleSpinner();
     }).catch(e => {
-      console.log(e + ' inside Promise');
-      $('.weathers').append(`<p>Sorry, the request has failed. Please wait a minute and refresh to try again.</p>`)
+      console.log(e + ' INSIDE PROMISE');
+      $('.weathers').append(`<p>Sorry, the request has failed. Please wait a minute and refresh to try again.</p>`);
+      toggleSpinner();
     });
   }).catch(e => {
-    console.log(e + ' outside Promise');
-    $('.weathers').append(`<p>Sorry, the API failed. Please wait a minute and refresh to try again.</p>`)
+    console.log(e + ' OUTSIDE PROMISE');
+    $('.weathers').append(`<p>Sorry, the request has failed. Please wait a minute and refresh to try again.</p>`);
+    toggleSpinner();
   });
 }
 function displayIconDivs(weatherChoices) {
@@ -159,7 +164,7 @@ function watchWeatherPicked(allWeather) {
   $('.weathers').on('click', '.weather', function() {
     const weatherPicked = $(this).children().attr('alt');
     const pickedWeatherDates = getPickedWeatherDates(allWeather, weatherPicked);
-    getMatchesFromWeatherDates(pickedWeatherDates, LeagueMatches, weatherPicked);
+    getMatchesFromWeatherDates(pickedWeatherDates, appState.LeagueMatches, weatherPicked);
   });
 }
 function getPickedWeatherDates(allWeather, weatherPicked) {
@@ -198,13 +203,13 @@ function getMatchesFromWeatherDates(pickedWeatherDates, leagueMatches, weatherPi
   displayWeatherMatchedResults(weatherMatchedMatches, weatherPicked, totalRecordObj, totalGoals, weatherRecordObj, weatherGoals);
 }
 function winLossCounter(homeTeam, awayTeam, winner, obj) {
-  if(homeTeam === TeamName && winner === 'HOME_TEAM') {
+  if(homeTeam === appState.TeamName && winner === 'HOME_TEAM') {
     obj.wins++;
-  } else if (awayTeam === TeamName && winner ==='AWAY_TEAM') {
+  } else if (awayTeam === appState.TeamName && winner ==='AWAY_TEAM') {
     obj.wins++;
-  } else if (homeTeam === TeamName && winner === 'AWAY_TEAM') {
+  } else if (homeTeam === appState.TeamName && winner === 'AWAY_TEAM') {
     obj.losses++;
-  } else if (awayTeam === TeamName && winner === 'HOME_TEAM') {
+  } else if (awayTeam === appState.TeamName && winner === 'HOME_TEAM') {
     obj.losses++;
   } else {
     obj.draws++;
@@ -212,7 +217,7 @@ function winLossCounter(homeTeam, awayTeam, winner, obj) {
   return obj;
 }
 function goalsCounter(match, goalsObj) {
-  if (match.homeTeam.name === TeamName) {
+  if (match.homeTeam.name === appState.TeamName) {
     goalsObj.goalsFor += match.score.fullTime.homeTeam;
     goalsObj.goalsAgainst += match.score.fullTime.awayTeam;
   } else {
@@ -221,24 +226,24 @@ function goalsCounter(match, goalsObj) {
   }
 }
 function displayWeatherMatchedResults(weatherMatchedMatches, weatherPicked, record, totalGoals, weatherRecord, weatherGoals) {
-  $('.selections__header').html(`Results for ${TeamName} playing in ${weatherPicked} weather`);$('.results').append(
+  $('.selections__header').html(`Results for ${appState.TeamName} playing in ${weatherPicked} weather`);$('.results').append(
       `<div class="results__season">
         <h2>Season Stats</h2>
         <h3>Record: ${record.wins}-${record.losses}-${record.draws}</h3>
         <h3>Win percent: ${(record.wins / (record.wins + record.losses + record.draws)).toFixed(3)}</h3>
         <h3>Goals For: ${totalGoals.goalsFor}</h3>
-        <h3>Goals For/Game: ${(totalGoals.goalsFor / (record.wins + record.losses + record.draws)).toFixed(2)}</h3>
+        <h3>GF/Game: ${(totalGoals.goalsFor / (record.wins + record.losses + record.draws)).toFixed(2)}</h3>
         <h3>Goals Against: ${totalGoals.goalsAgainst}</h3>
-        <h3>Goals Against/Game ${(totalGoals.goalsAgainst / (record.wins + record.losses + record.draws)).toFixed(2)}</h3>
+        <h3>GA/Game ${(totalGoals.goalsAgainst / (record.wins + record.losses + record.draws)).toFixed(2)}</h3>
       </div>
       <div class="results__weather">
         <h2>Weather Stats</h2>
         <h3>Record: ${weatherRecord.wins}-${weatherRecord.losses}-${weatherRecord.draws}</h3>
         <h3>Win percent: ${(weatherRecord.wins / (weatherRecord.wins + weatherRecord.losses + weatherRecord.draws)).toFixed(3)}</h3>
         <h3>Goals For: ${weatherGoals.goalsFor}</h3>
-        <h3>Goals For/Game: ${(weatherGoals.goalsFor / (record.wins + record.losses + record.draws)).toFixed(2)}</h3>
+        <h3>GF/Game: ${(weatherGoals.goalsFor / (weatherRecord.wins + weatherRecord.losses + weatherRecord.draws)).toFixed(2)}</h3>
         <h3>Goals Against: ${weatherGoals.goalsAgainst}</h3>
-        <h3>Goals Against/Game ${(weatherGoals.goalsAgainst / (record.wins + record.losses + record.draws)).toFixed(2)}</h3>
+        <h3>GA/Game ${(weatherGoals.goalsAgainst / (weatherRecord.wins + weatherRecord.losses + weatherRecord.draws)).toFixed(2)}</h3>
       </div>`);
   $('.weathers').hide();
   // Individual Game Results
