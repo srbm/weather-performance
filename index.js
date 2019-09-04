@@ -1,7 +1,13 @@
 /* eslint-disable require-jsdoc */
 /* eslint-disable no-invalid-this */
 'use strict';
-
+// const STATE = {
+// };
+// const stateRenders = {
+//   initial: initialPage,
+//   weather: renderWeather,
+//   results: renderResults,
+// }
 let appState = {
   'LeagueMatches' : [],
   'TeamName' : '',
@@ -14,13 +20,12 @@ function watchInitialPage() {
       .then(json => {
         addTeamsToDom(json);
         watchTeamClick();
-        toggleSpinner();
       })
       .catch(e => {
-        console.log(e + ' line 42');
-        $('.errors').append(`<p>The request failed. ${e}</p>`);
-        toggleSpinner();
-      });
+        console.log(e + '; watchInitialPage ');
+        $('.errors').append(`<p>The request has failed due to too many requests.</p>`);
+      })
+      .finally(toggleSpinner());
 }
 function addTeamsToDom(response) {
   for (let i = 0; i<20; i++) {
@@ -55,6 +60,11 @@ function getMatches(teamId) {
       .then(handleFetchResponse)
       .then(data => {
         appState.LeagueMatches = getPLTeamMatchesData(data);
+      })
+      .catch( e => {
+        console.log(e + '; this error in getMatches');
+        $('.weathers').hide();
+        $('.errors').append("<p>There have been too many requests. Please try again later.</p>");
       });
 }
 
@@ -69,8 +79,8 @@ function changeToWeatherOptions(teamId) {
         $('.weathers').append(`
             <p>Unfortunately the request has failed and the matches didn't load.
              Please refresh to try again.</p>`);
-             toggleSpinner();
-      });
+      })
+      .finally(toggleSpinner());
 }
 function getWeatherCallParams(data) {
   const weatherCallsParams = [];
@@ -104,12 +114,9 @@ function makeWeatherCallParamsObj(matches, homeTeamsArr, weatherCallsParams) {
 
 function getPLTeamMatchesData(data) {
   const PLMatches = [];
-  // const totalRecordObj = {'wins': 0, 'losses': 0, 'draws': 0};
   for (let i = 0; i<data.count; i++) {
     if (data.matches[i].competition.name === "Premier League") {
       PLMatches.push(data.matches[i]);
-      // winLossCounter(data.matches[i].homeTeam.name, data.matches[i].awayTeam.name, data.matches[i].score.winner, totalRecordObj);
-      // console.log(PLMatches);
     }
   }
   console.log(PLMatches);
@@ -123,33 +130,28 @@ function getWeatherData(paramsArr) {
   const weatherChoices = new Set();
   const weatherPerGame = [];
   for (let i=0; i < paramsArr.length; i++) {
-    weathersPromArr.push(returnWeatherPromise(paramsArr, i));
+    weathersPromArr.push(fetchWeather(paramsArr, i));
   }
-  Promise.all(weathersPromArr).then(arr => {
-    const promArr = [];
-    arr.forEach(item => {
-      promArr.push(item.json());
-    });
-    Promise.all(promArr).then(data => {
-      data.forEach(item => {
-        weatherChoices.add(item.currently.icon);
-        weatherPerGame.push(item.currently);
+  Promise.all(weathersPromArr)
+      .then(arr => {
+        const promArr = [];
+        arr.forEach(item => {
+          promArr.push(item.json());
+        });
+        return Promise.all(promArr);
+      })
+      .then(data => {
+        data.forEach(item => {
+          weatherChoices.add(item.currently.icon);
+          weatherPerGame.push(item.currently);
+        });
+        displayIconDivs(weatherChoices);
+        console.log(weatherPerGame);
+        watchWeatherPicked(weatherPerGame);
+      }).catch(e => {
+        console.log(e + ' INSIDE PROMISE');
+        $('.weathers').append(`<p>Sorry, the request has failed. Please wait a minute and refresh to try again.</p>`);
       });
-      displayIconDivs(weatherChoices);
-      console.log(weatherPerGame);
-      watchWeatherPicked(weatherPerGame);
-      // getPickedWeatherDates(allWeather);
-      toggleSpinner();
-    }).catch(e => {
-      console.log(e + ' INSIDE PROMISE');
-      $('.weathers').append(`<p>Sorry, the request has failed. Please wait a minute and refresh to try again.</p>`);
-      toggleSpinner();
-    });
-  }).catch(e => {
-    console.log(e + ' OUTSIDE PROMISE');
-    $('.weathers').append(`<p>Sorry, the request has failed. Please wait a minute and refresh to try again.</p>`);
-    toggleSpinner();
-  });
 }
 function displayIconDivs(weatherChoices) {
   console.log(weatherChoices);
@@ -271,7 +273,7 @@ function fetchAllTeamMatches(teamId) {
   return fetch(`https://api.football-data.org/v2/teams/${teamId}/matches?dateFrom=2018-08-10&dateTo=2019-05-12`,
       {headers: {'X-Auth-Token': '42b54b95666e4b969e41a0e7361afe71'}});
 }
-function returnWeatherPromise(paramsArr, i) {
+function fetchWeather(paramsArr, i) {
   return fetch(`https://cors-anywhere.herokuapp.com/https://api.darksky.net/forecast/9f2b441e09bacb0213aaa8eab1f74725/${paramsArr[i].lat},${paramsArr[i].long},${paramsArr[i].utcDate}`);
 }
 function handleFetchResponse(fetchedPromise) {
