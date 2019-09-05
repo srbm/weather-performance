@@ -1,18 +1,42 @@
 /* eslint-disable require-jsdoc */
 /* eslint-disable no-invalid-this */
 'use strict';
-// const STATE = {
-// };
-// const stateRenders = {
-//   initial: initialPage,
-//   weather: renderWeather,
-//   results: renderResults,
-// }
-let appState = {
+const STATE = {
+};
+const stateRenders = {
+  initial: watchInitialPage,
+  team: renderTeam,
+  // results: renderResults,
+}
+const appState = {
   'LeagueMatches' : [],
   'TeamName' : '',
 };
-
+function renderTeam() {
+  const team = STATE;
+  const html = `<h2>Selected Team: ${team.team}</h2>`;
+  $('.stateTeam').html(html);
+  addBackBtn('team', 'initial');
+}
+function updateState(to) {
+  return (data) => {
+    STATE[to] = appState.TeamName;
+    console.log(STATE);
+    stateRenders[to]();
+  }
+}
+function addBackBtn(from, to) {
+  const backBtn = $('<button>Go Back</button>');
+  backBtn.click(() => {
+    delete STATE[from];
+    $('.state__btn, .state__team').empty();
+    console.log(STATE);
+    stateRenders[to]();
+    $('.teams').toggle();
+    $('.weathers').toggle();
+  });
+  $('.state__btn').html(backBtn);
+}
 
 function watchInitialPage() {
   fetchLeagueTeams()
@@ -25,7 +49,7 @@ function watchInitialPage() {
         console.log(e + '; watchInitialPage ');
         $('.errors').append(`<p>The request has failed due to too many requests.</p>`);
       })
-      .finally(toggleSpinner());
+      .finally($('.lds-spinner').hide());
 }
 function addTeamsToDom(response) {
   for (let i = 0; i<20; i++) {
@@ -36,7 +60,7 @@ function addTeamsToDom(response) {
     if (!$('.team:eq('+i+') img').attr('src')) {
       $('.team:eq('+i+') img').attr('src', response.teams[i].crestUrl);
     }
-    $('.team:eq('+i+')').append(`<h3>${response.teams[i].name}</h3>`);
+    $('.team:eq('+i+') h3').html(`${response.teams[i].name}`);
   }
   $('.team img').on('load', () => {
     $('.team').css('display', 'flex');
@@ -61,8 +85,9 @@ function getMatches(teamId) {
       .then(data => {
         appState.LeagueMatches = getPLTeamMatchesData(data);
       })
+      .then(updateState('team'))
       .catch( e => {
-        console.log(e + '; this error in getMatches');
+        console.log(e + '; --getMatches');
         $('.weathers').hide();
         $('.errors').append("<p>There have been too many requests. Please try again later.</p>");
       });
@@ -75,12 +100,12 @@ function changeToWeatherOptions(teamId) {
       .then(getWeatherCallParams)
       .then(getWeatherData)
       .catch(err => {
-        console.log(err + ' changeToWeatherOptions')
-        $('.weathers').append(`
+        console.log(err + '; --changeToWeatherOptions')
+        $('.errors').append(`
             <p>Unfortunately the request has failed and the matches didn't load.
              Please refresh to try again.</p>`);
       })
-      .finally(toggleSpinner());
+      .finally(toggleSpinner);
 }
 function getWeatherCallParams(data) {
   const weatherCallsParams = [];
@@ -149,18 +174,22 @@ function getWeatherData(paramsArr) {
         console.log(weatherPerGame);
         watchWeatherPicked(weatherPerGame);
       }).catch(e => {
-        console.log(e + ' INSIDE PROMISE');
+        console.log(e + '; --promise.all chain');
         $('.weathers').append(`<p>Sorry, the request has failed. Please wait a minute and refresh to try again.</p>`);
       });
 }
 function displayIconDivs(weatherChoices) {
   console.log(weatherChoices);
+  if ($('.weathers').html()) {
+    $('.weathers').empty();
+  }
   weatherChoices.forEach(function(icon) {
     $('.weathers').append(`<div class="weather">
                             <i class="wi wi-forecast-io-${icon}" alt="${icon}"/></i>
                               <p>${icon}</p>
                           </div>`);
   });
+  $('.weathers').show();
 }
 function watchWeatherPicked(allWeather) {
   $('.weathers').on('click', '.weather', function() {
@@ -228,7 +257,7 @@ function goalsCounter(match, goalsObj) {
   }
 }
 function displayWeatherMatchedResults(weatherMatchedMatches, weatherPicked, record, totalGoals, weatherRecord, weatherGoals) {
-  $('.selections__header').html(`Results for ${appState.TeamName} playing in ${weatherPicked} weather`);$('.results').append(
+  $('.selections__header').html(`Results for ${appState.TeamName} playing in ${weatherPicked} weather`);$('.results').html(
       `<div class="results__season">
         <h2>Season Stats</h2>
         <h3>Record: ${record.wins}-${record.losses}-${record.draws}</h3>
@@ -250,7 +279,7 @@ function displayWeatherMatchedResults(weatherMatchedMatches, weatherPicked, reco
   $('.weathers').hide();
   // Individual Game Results
   // weatherMatchedMatches.forEach(match => {
-  //   $('.results').append(
+  //   $('.results').html(
   //       `<div class="result">
   //         <h4>${match.homeTeam} Score: ${match.score.homeTeam}</h4>
   //         <h4>${match.awayTeam} Score: ${match.score.awayTeam}</h4>
