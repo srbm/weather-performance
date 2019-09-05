@@ -6,24 +6,32 @@ const STATE = {
 const stateRenders = {
   initial: watchInitialPage,
   team: renderTeam,
-  // results: renderResults,
+  weather: renderWeather,
 }
 const appState = {
   'LeagueMatches' : [],
   'TeamName' : '',
 };
 function renderTeam() {
-  const team = STATE;
-  const html = `<h2>Selected Team: ${team.team}</h2>`;
-  $('.stateTeam').html(html);
+  const team = STATE.team;
+  console.log(team);
+  const html = `<h2>Selected Team: ${team.TeamName}</h2>`;
+  $('.state__team').html(html);
   addBackBtn('team', 'initial');
 }
+function renderWeather() {
+  const weather = STATE.team;
+  console.log(weather);
+  const html = `<h2>Selected Weather: ${weather.weatherPicked}</h2>`;
+  $('.state__weather').html(html);
+  addBackBtn('weather', 'team');
+}
 function updateState(to) {
-  return (data) => {
-    STATE[to] = appState.TeamName;
-    console.log(STATE);
+  return () => {
+    STATE[to] = appState;
+    console.log(STATE[to]);
     stateRenders[to]();
-  }
+  };
 }
 function addBackBtn(from, to) {
   const backBtn = $('<button>Go Back</button>');
@@ -84,6 +92,7 @@ function getMatches(teamId) {
       .then(handleFetchResponse)
       .then(data => {
         appState.LeagueMatches = getPLTeamMatchesData(data);
+        return data;
       })
       .then(updateState('team'))
       .catch( e => {
@@ -145,7 +154,7 @@ function getPLTeamMatchesData(data) {
     }
   }
   console.log(PLMatches);
-  return (PLMatches);
+  return PLMatches;
 }
 
 
@@ -173,7 +182,8 @@ function getWeatherData(paramsArr) {
         displayIconDivs(weatherChoices);
         console.log(weatherPerGame);
         watchWeatherPicked(weatherPerGame);
-      }).catch(e => {
+      })
+      .catch(e => {
         console.log(e + '; --promise.all chain');
         $('.weathers').append(`<p>Sorry, the request has failed. Please wait a minute and refresh to try again.</p>`);
       });
@@ -194,6 +204,7 @@ function displayIconDivs(weatherChoices) {
 function watchWeatherPicked(allWeather) {
   $('.weathers').on('click', '.weather', function() {
     const weatherPicked = $(this).children().attr('alt');
+    appState.weatherPicked = weatherPicked;
     const pickedWeatherDates = getPickedWeatherDates(allWeather, weatherPicked);
     getMatchesFromWeatherDates(pickedWeatherDates, appState.LeagueMatches, weatherPicked);
   });
@@ -232,6 +243,7 @@ function getMatchesFromWeatherDates(pickedWeatherDates, leagueMatches, weatherPi
     }
   });
   displayWeatherMatchedResults(weatherMatchedMatches, weatherPicked, totalRecordObj, totalGoals, weatherRecordObj, weatherGoals);
+  updateState('weather');
 }
 function winLossCounter(homeTeam, awayTeam, winner, obj) {
   if(homeTeam === appState.TeamName && winner === 'HOME_TEAM') {
