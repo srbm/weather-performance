@@ -2,37 +2,41 @@
 /* eslint-disable no-invalid-this */
 'use strict';
 const STATE = {
+  team: {},
+  weather: {},
 };
 const stateRenders = {
   initial: watchInitialPage,
-  team: renderTeam,
   weather: renderWeather,
+  team: renderTeam,
 }
 const appState = {
   'LeagueMatches' : [],
   'TeamName' : '',
 };
+function updateState(to) {
+  console.log('updateState called');
+  // console.log('updateState return function called' + data);
+  STATE[to] = appState;
+  console.log(STATE + " update state");
+  return stateRenders[to]();
+}
 function renderTeam() {
   const team = STATE.team;
-  console.log(team);
+  console.log(team + ' renderTeam');
   const html = `<h2>Selected Team: ${team.TeamName}</h2>`;
   $('.state__team').html(html);
   addBackBtn('team', 'initial');
 }
 function renderWeather() {
-  const weather = STATE.team;
-  console.log(weather);
+  console.log('renderWeather called');
+  const weather = STATE.weather;
+  console.log(weather.weatherPicked + ' renderWeather');
   const html = `<h2>Selected Weather: ${weather.weatherPicked}</h2>`;
   $('.state__weather').html(html);
   addBackBtn('weather', 'team');
 }
-function updateState(to) {
-  return () => {
-    STATE[to] = appState;
-    console.log(STATE[to]);
-    stateRenders[to]();
-  };
-}
+
 function addBackBtn(from, to) {
   const backBtn = $('<button>Go Back</button>');
   backBtn.click(() => {
@@ -45,6 +49,10 @@ function addBackBtn(from, to) {
   });
   $('.state__btn').html(backBtn);
 }
+
+
+
+
 
 function watchInitialPage() {
   fetchLeagueTeams()
@@ -207,6 +215,7 @@ function watchWeatherPicked(allWeather) {
     appState.weatherPicked = weatherPicked;
     const pickedWeatherDates = getPickedWeatherDates(allWeather, weatherPicked);
     getMatchesFromWeatherDates(pickedWeatherDates, appState.LeagueMatches, weatherPicked);
+    updateState('weather');
   });
 }
 function getPickedWeatherDates(allWeather, weatherPicked) {
@@ -243,10 +252,9 @@ function getMatchesFromWeatherDates(pickedWeatherDates, leagueMatches, weatherPi
     }
   });
   displayWeatherMatchedResults(weatherMatchedMatches, weatherPicked, totalRecordObj, totalGoals, weatherRecordObj, weatherGoals);
-  updateState('weather');
 }
 function winLossCounter(homeTeam, awayTeam, winner, obj) {
-  if(homeTeam === appState.TeamName && winner === 'HOME_TEAM') {
+  if (homeTeam === appState.TeamName && winner === 'HOME_TEAM') {
     obj.wins++;
   } else if (awayTeam === appState.TeamName && winner ==='AWAY_TEAM') {
     obj.wins++;
@@ -269,7 +277,8 @@ function goalsCounter(match, goalsObj) {
   }
 }
 function displayWeatherMatchedResults(weatherMatchedMatches, weatherPicked, record, totalGoals, weatherRecord, weatherGoals) {
-  $('.selections__header').html(`Results for ${appState.TeamName} playing in ${weatherPicked} weather`);$('.results').html(
+  $('.selections__header').html(`Results for ${appState.TeamName} playing in ${weatherPicked} weather`);
+  $('.results').html(
       `<div class="results__season">
         <h2>Season Stats</h2>
         <h3>Record: ${record.wins}-${record.losses}-${record.draws}</h3>
@@ -289,6 +298,8 @@ function displayWeatherMatchedResults(weatherMatchedMatches, weatherPicked, reco
         <h3>GA/Game ${(weatherGoals.goalsAgainst / (weatherRecord.wins + weatherRecord.losses + weatherRecord.draws)).toFixed(2)}</h3>
       </div>`);
   $('.weathers').hide();
+
+
   // Individual Game Results
   // weatherMatchedMatches.forEach(match => {
   //   $('.results').html(
