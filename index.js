@@ -2,13 +2,11 @@
 /* eslint-disable no-invalid-this */
 'use strict';
 const STATE = {
-  team: {},
-  weather: {},
 };
 const stateRenders = {
   initial: watchInitialPage,
-  weather: renderWeather,
-  team: renderTeam,
+  pickedTeam: renderWeather,
+  pickedWeather: renderResults,
 }
 const appState = {
   'LeagueMatches' : [],
@@ -18,23 +16,29 @@ function updateState(to) {
   console.log('updateState called');
   // console.log('updateState return function called' + data);
   STATE[to] = appState;
-  console.log(STATE + " update state");
   return stateRenders[to]();
 }
-function renderTeam() {
-  const team = STATE.team;
-  console.log(team + ' renderTeam');
+function renderWeather() {
+  const team = STATE.pickedTeam;
+  console.log(team + ' renderWeather');
   const html = `<h2>Selected Team: ${team.TeamName}</h2>`;
   $('.state__team').html(html);
-  addBackBtn('team', 'initial');
+  $('.teams').hide();
+  $('.state__weather').hide();
+  $('.results').hide();
+  $('.weathers').show();
+  addBackBtn('pickedTeam', 'initial');
 }
-function renderWeather() {
+function renderResults() {
   console.log('renderWeather called');
-  const weather = STATE.weather;
-  console.log(weather.weatherPicked + ' renderWeather');
+  const weather = STATE.pickedWeather;
+  console.log(weather.weatherPicked + ' renderResults');
   const html = `<h2>Selected Weather: ${weather.weatherPicked}</h2>`;
-  $('.state__weather').html(html);
-  addBackBtn('weather', 'team');
+  $('.state__weather').html(html).show();
+  $('.teams').hide();
+  $('.weathers').hide();
+  $('.results').show();
+  addBackBtn('pickedWeather', 'pickedTeam');
 }
 
 function addBackBtn(from, to) {
@@ -42,10 +46,8 @@ function addBackBtn(from, to) {
   backBtn.click(() => {
     delete STATE[from];
     $('.state__btn, .state__team').empty();
-    console.log(STATE);
+    console.log(STATE + ' addBackBtn');
     stateRenders[to]();
-    $('.teams').toggle();
-    $('.weathers').toggle();
   });
   $('.state__btn').html(backBtn);
 }
@@ -60,6 +62,8 @@ function watchInitialPage() {
       .then(json => {
         addTeamsToDom(json);
         watchTeamClick();
+        $('.weathers').hide();
+        $('.teams').show();
       })
       .catch(e => {
         console.log(e + '; watchInitialPage ');
@@ -102,7 +106,7 @@ function getMatches(teamId) {
         appState.LeagueMatches = getPLTeamMatchesData(data);
         return data;
       })
-      .then(updateState('team'))
+      .then(updateState('pickedTeam'))
       .catch( e => {
         console.log(e + '; --getMatches');
         $('.weathers').hide();
@@ -215,7 +219,7 @@ function watchWeatherPicked(allWeather) {
     appState.weatherPicked = weatherPicked;
     const pickedWeatherDates = getPickedWeatherDates(allWeather, weatherPicked);
     getMatchesFromWeatherDates(pickedWeatherDates, appState.LeagueMatches, weatherPicked);
-    updateState('weather');
+    updateState('pickedWeather');
   });
 }
 function getPickedWeatherDates(allWeather, weatherPicked) {
