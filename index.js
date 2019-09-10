@@ -107,7 +107,9 @@ function changeToWeatherOptions(teamId) {
       .then(getWeatherCallParams)
       .then(getWeatherData)
       .catch(err => {
-        console.log(err + '; --changeToWeatherOptions')
+        console.log(err + '; --changeToWeatherOptions');
+        console.trace();
+        console.log(err.stack);
         $('.errors').append(`
             <p>Unfortunately the request has failed and the matches didn't load.
              Please refresh to try again.</p>`);
@@ -322,15 +324,11 @@ function fetchWeather(paramsArr, i) {
 function handleFetchResponse(fetchedPromise) {
   return fetchedPromise.json()
       .then(json => {
-        if (!fetchedPromise.ok) {
-          const error = Object.assign({}, json, {
-            status: fetchedPromise.status,
-            statusText: fetchedPromise.statusText,
-          });
-          console.log(error);
-          return Promise.reject(error);
+        console.log(fetchedPromise.ok);
+        if (fetchedPromise.ok) {
+          return Promise.resolve(json);
         } else {
-          return json;
+          throw Error(fetchedPromise);
         }
       });
 }
