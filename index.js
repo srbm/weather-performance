@@ -67,7 +67,7 @@ function watchInitialPage() {
       })
       .catch(e => {
         console.log(e + '; watchInitialPage ');
-        $('.errors').append(`<p>The request has failed due to too many requests.</p>`);
+        $('.errors').append(`<p>The request has failed due to too many requests. Please try again later.</p>`);
       })
       .finally($('.lds-spinner').hide());
 }
@@ -91,27 +91,13 @@ function watchTeamClick() {
     const teamId = $(this).data('team-id');
     appState.TeamName = $(this).data('team-name');
     handleTeamClick(teamId);
-    getMatches(teamId);
+    updateState('pickedTeam');
   });
 }
 function handleTeamClick(teamId) {
   hideAllTeams();
   $('.selections__header').html('Select a weather condition');
   changeToWeatherOptions(teamId);
-}
-function getMatches(teamId) {
-  fetchAllTeamMatches(teamId)
-      .then(handleFetchResponse)
-      .then(data => {
-        appState.LeagueMatches = getPLTeamMatchesData(data);
-        return data;
-      })
-      .then(updateState('pickedTeam'))
-      .catch( e => {
-        console.log(e + '; --getMatches');
-        $('.weathers').hide();
-        $('.errors').append("<p>There have been too many requests. Please try again later.</p>");
-      });
 }
 
 function changeToWeatherOptions(teamId) {
@@ -131,6 +117,7 @@ function changeToWeatherOptions(teamId) {
 function getWeatherCallParams(data) {
   const weatherCallsParams = [];
   const leagueMatches = getPLTeamMatchesData(data);
+  appState.LeagueMatches = getPLTeamMatchesData(data);
   const homeTeamPerMatch = getGameHomeTeam(leagueMatches);
   makeWeatherCallParamsObj(leagueMatches, homeTeamPerMatch, weatherCallsParams);
   return weatherCallsParams;
@@ -340,6 +327,7 @@ function handleFetchResponse(fetchedPromise) {
             status: fetchedPromise.status,
             statusText: fetchedPromise.statusText,
           });
+          console.log(error);
           return Promise.reject(error);
         } else {
           return json;
