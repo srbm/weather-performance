@@ -54,8 +54,6 @@ function addBackBtn(from, to) {
 
 
 
-
-
 function watchInitialPage() {
   fetchLeagueTeams()
       .then(handleFetchResponse)
@@ -67,7 +65,7 @@ function watchInitialPage() {
       })
       .catch(e => {
         console.log(e + '; watchInitialPage ');
-        $('.errors').append(`<p>The request has failed due to too many requests. Please try again later.</p>`);
+        handleError(e);
       })
       .finally($('.lds-spinner').hide());
 }
@@ -106,13 +104,9 @@ function changeToWeatherOptions(teamId) {
       .then(handleFetchResponse)
       .then(getWeatherCallParams)
       .then(getWeatherData)
-      .catch(err => {
-        console.log(err + '; --changeToWeatherOptions');
-        console.trace();
-        console.log(err.stack);
-        $('.errors').append(`
-            <p>Unfortunately the request has failed and the matches didn't load.
-             Please refresh to try again.</p>`);
+      .catch(e => {
+        console.log(e + '; --changeToWeatherOptions');
+        handleError(e);
       })
       .finally(toggleSpinner);
 }
@@ -186,7 +180,7 @@ function getWeatherData(paramsArr) {
       })
       .catch(e => {
         console.log(e + '; --promise.all chain');
-        $('.weathers').append(`<p>Sorry, the request has failed. Please wait a minute and refresh to try again.</p>`);
+        handleError(e);
       });
 }
 function displayIconDivs(weatherChoices) {
@@ -325,12 +319,18 @@ function handleFetchResponse(fetchedPromise) {
   return fetchedPromise.json()
       .then(json => {
         console.log(fetchedPromise.ok);
-        if (fetchedPromise.ok) {
+      if (fetchedPromise.ok) {
           return Promise.resolve(json);
         } else {
           throw Error(fetchedPromise);
         }
       });
+}
+function handleError(err) {
+  $('.errors').append(`<p>The request has failed due to too many requests. Please try again later.</p>`);
+  $('.teams').hide();
+  $('.weathers').hide();
+  $('.results').hide();
 }
 
 function toggleSpinner() {
@@ -404,3 +404,4 @@ const GlobalLatLong = [
 ];
 
 $(watchInitialPage);
+$(watchTeamClick);
