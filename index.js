@@ -59,7 +59,7 @@ function watchInitialPage() {
       .then(handleFetchResponse)
       .then(json => {
         addTeamsToDom(json);
-        watchTeamClick();
+
         $('.weathers').hide();
         $('.teams').show();
       })
@@ -67,7 +67,9 @@ function watchInitialPage() {
         console.log(e + '; watchInitialPage ');
         handleError(e);
       })
-      .finally($('.lds-spinner').hide());
+      .finally(() => {
+        $('.lds-spinner').hide();
+      });
 }
 function addTeamsToDom(response) {
   for (let i = 0; i<20; i++) {
