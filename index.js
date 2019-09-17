@@ -46,7 +46,6 @@ function addBackBtn(from, to) {
   backBtn.click(() => {
     delete STATE[from];
     $('.state__btn, .state__team').empty();
-    console.log(STATE + ' addBackBtn');
     stateRenders[to]();
   });
   $('.state__btn').html(backBtn);
@@ -55,12 +54,12 @@ function addBackBtn(from, to) {
 
 
 function watchInitialPage() {
+  $('.weathers').hide().empty();
+  $('.lds-spinner').show();
   fetchLeagueTeams()
       .then(handleFetchResponse)
       .then(json => {
         addTeamsToDom(json);
-
-        $('.weathers').hide();
         $('.teams').show();
       })
       .catch(e => {
@@ -150,7 +149,11 @@ function getPLTeamMatchesData(data) {
       PLMatches.push(data.matches[i]);
     }
   }
-  console.log(PLMatches);
+  //   console.log(data.matches);
+  // const PLMatches = data.matches.filter(match => {
+  //   match.competition.name === "Premier League"
+  // });
+  // console.log(PLMatches + ' --PLMatches');
   return PLMatches;
 }
 
@@ -329,10 +332,8 @@ function handleFetchResponse(fetchedPromise) {
       });
 }
 function handleError(err) {
-  $('.errors').append(`<p>The request has failed due to too many requests. Please try again later.</p>`);
-  $('.teams').hide();
-  $('.weathers').hide();
-  $('.results').hide();
+  $('.errors').append(`<p>The request has failed due to too many requests. Please try again later.</p>`).show();
+  $('button, .state, .selections__header, .teams, .weathers, .results').hide();
 }
 
 function toggleSpinner() {

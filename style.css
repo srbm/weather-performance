@@ -54,6 +54,22 @@ section:first-child {
 .selections h4 {
   font-size: 18px; }
 
+.errors {
+  margin: 100px auto;
+  display: none; }
+
+.state__btn {
+  margin: 30px auto; }
+  .state__btn button {
+    padding: 10px 20px;
+    font-size: 16px;
+    font-weight: bold;
+    border: 2px solid black;
+    border-radius: 3px; }
+    .state__btn button:hover {
+      box-shadow: 2px 2px 6px rgba(4, 245, 255, 0.8);
+      border: 2px solid #e90052; }
+
 .teams {
   display: flex;
   flex-wrap: wrap;
@@ -75,7 +91,8 @@ section:first-child {
       border: 2px solid #e90052; }
     .teams .team img {
       height: 170px;
-      width: auto; }
+      width: auto;
+      object-fit: contain; }
     .teams .team h3 {
       margin-top: .5em; }
 
