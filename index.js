@@ -13,14 +13,14 @@ const appState = {
   'TeamName' : '',
 };
 function updateState(to) {
-  console.log('updateState called');
+  // console.log('updateState called');
   // console.log('updateState return function called' + data);
   STATE[to] = appState;
   return stateRenders[to]();
 }
 function renderWeather() {
   const team = STATE.pickedTeam;
-  console.log(team + ' renderWeather');
+  // console.log(team + ' renderWeather');
   const html = `<h2>Selected Team: ${team.TeamName}</h2>`;
   $('.state__team').html(html);
   $('.teams').hide();
@@ -30,9 +30,9 @@ function renderWeather() {
   addBackBtn('pickedTeam', 'initial');
 }
 function renderResults() {
-  console.log('renderWeather called');
+  // console.log('renderWeather called');
   const weather = STATE.pickedWeather;
-  console.log(weather.weatherPicked + ' renderResults');
+  // console.log(weather.weatherPicked + ' renderResults');
   const html = `<h2>Selected Weather: ${weather.weatherPicked}</h2>`;
   $('.state__weather').html(html).show();
   $('.teams').hide();
@@ -180,7 +180,7 @@ function getWeatherData(paramsArr) {
           weatherPerGame.push(item.currently);
         });
         displayIconDivs(weatherChoices);
-        console.log(weatherPerGame);
+        // console.log(weatherPerGame);
         watchWeatherPicked(weatherPerGame);
       })
       .catch(e => {
@@ -189,7 +189,7 @@ function getWeatherData(paramsArr) {
       });
 }
 function displayIconDivs(weatherChoices) {
-  console.log(weatherChoices);
+  // console.log(weatherChoices);
   if ($('.weathers').html()) {
     $('.weathers').empty();
   }
@@ -212,7 +212,7 @@ function watchWeatherPicked(allWeather) {
 }
 function getPickedWeatherDates(allWeather, weatherPicked) {
   const pickedWeatherDates = [];
-  console.log(weatherPicked);
+  // console.log(weatherPicked);
   allWeather.forEach(item => {
     if (weatherPicked === item.icon) {
       const date = new Date(item.time*1000).getTime();
@@ -235,7 +235,6 @@ function getMatchesFromWeatherDates(pickedWeatherDates, leagueMatches, weatherPi
       if (mDate == pickedWeatherDates[i]) {
         winLossCounter(match.homeTeam.name, match.awayTeam.name, match.score.winner, weatherRecordObj);
         goalsCounter(match, weatherGoals);
-        console.log('dates equal');
         weatherMatchedMatches.push({
           'homeTeam': match.homeTeam.name,
           'awayTeam': match.awayTeam.name,
@@ -323,7 +322,7 @@ function fetchWeather(paramsArr, i) {
 function handleFetchResponse(fetchedPromise) {
   return fetchedPromise.json()
       .then(json => {
-        console.log(fetchedPromise.ok);
+        // console.log(fetchedPromise.ok);
       if (fetchedPromise.ok) {
           return Promise.resolve(json);
         } else {
