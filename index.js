@@ -74,20 +74,21 @@ function addTeamsToDom(response) {
   for (let i = 0; i<20; i++) {
     const teamId = response.teams[i].id;
     const teamName = response.teams[i].name;
+    $('.teams').append(`<div class="team"><img></img><h3></h3></div>`);
     $('.team:eq('+i+')').data('team-name', teamName);
     $('.team:eq('+i+')').data('team-id', teamId);
-    if (!$('.team:eq('+i+') img').attr('src')) {
-      $('.team:eq('+i+') img').attr('src', response.teams[i].crestUrl);
-    }
-    $('.team:eq('+i+') h3').html(`${response.teams[i].name}`);
+    $('.team:eq('+i+') img').attr('src', response.teams[i].crestUrl);
+    $('.team:eq('+i+') img').attr('alt', teamName);
+    $('.team:eq('+i+') h3').html(`${teamName}`);
   }
   $('.team img').on('load', () => {
     $('.team').css('display', 'flex');
   });
 }
 function watchTeamClick() {
-  $('.team').on('click', function() {
+  $('.teams').on('click', '.team', function() {
     const teamId = $(this).data('team-id');
+    console.log(teamId);
     appState.TeamName = $(this).data('team-name');
     handleTeamClick(teamId);
     updateState('pickedTeam');
