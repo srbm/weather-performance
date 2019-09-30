@@ -1,0 +1,12 @@
+User Feedback Notes:
+
+-Back button useful
+-Number the instructions
+-Hide header instructions after selecting?
+-Change what’s selected to text to icons that were selected
+-Clarify Results headers (season stats/ weather stats)
+-Organize results in a table for easier understanding
+-Use header logos for a ‘Home’ button 
+
+-Bug: extra team boxes after teams
+-Bug: Selection header says ‘weather’ after go back to teams
