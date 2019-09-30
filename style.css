@@ -16,6 +16,10 @@ h1 {
 p {
   font-size: 22px; }
 
+ol {
+  list-style: decimal;
+  color: #38003c; }
+
 .header {
   background-color: #00ff85;
   padding: 1em 1em;

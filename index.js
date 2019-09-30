@@ -54,7 +54,8 @@ function addBackBtn(from, to) {
 
 
 function watchInitialPage() {
-  $('.weathers').hide().empty();
+  $('.selections__header').html('Select a team.');
+  $('.weathers, .teams').hide().empty();
   $('.lds-spinner').show();
   fetchLeagueTeams()
       .then(handleFetchResponse)
@@ -106,6 +107,7 @@ function changeToWeatherOptions(teamId) {
       .then(handleFetchResponse)
       .then(getWeatherCallParams)
       .then(getWeatherData)
+      .then(addWeatherOptions)
       .catch(e => {
         console.log(e + '; --changeToWeatherOptions');
         handleError(e);
@@ -158,37 +160,34 @@ function getPLTeamMatchesData(data) {
   return PLMatches;
 }
 
-
-
 function getWeatherData(paramsArr) {
   const weathersPromArr = [];
-  const weatherChoices = new Set();
-  const weatherPerGame = [];
+  
   for (let i=0; i < paramsArr.length; i++) {
     weathersPromArr.push(fetchWeather(paramsArr, i));
   }
-  Promise.all(weathersPromArr)
-      .then(arr => {
-        const promArr = [];
-        arr.forEach(item => {
-          promArr.push(item.json());
-        });
-        return Promise.all(promArr);
-      })
-      .then(data => {
-        data.forEach(item => {
-          weatherChoices.add(item.currently.icon);
-          weatherPerGame.push(item.currently);
-        });
-        displayIconDivs(weatherChoices);
-        // console.log(weatherPerGame);
-        watchWeatherPicked(weatherPerGame);
-      })
-      .catch(e => {
-        console.log(e + '; --promise.all chain');
-        handleError(e);
+  return Promise.all(weathersPromArr)
+    .then(arr => {
+      const promArr = [];
+      arr.forEach(item => {
+        promArr.push(item.json());
       });
+      return Promise.all(promArr);
+    });
 }
+
+function addWeatherOptions(data) {
+  const weatherChoices = new Set();
+  const weatherPerGame = [];
+  data.forEach(item => {
+    weatherChoices.add(item.currently.icon);
+    weatherPerGame.push(item.currently);
+  });
+  displayIconDivs(weatherChoices);
+  // console.log(weatherPerGame);
+  watchWeatherPicked(weatherPerGame);
+}
+
 function displayIconDivs(weatherChoices) {
   // console.log(weatherChoices);
   if ($('.weathers').html()) {

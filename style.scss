@@ -25,6 +25,10 @@ h1 {
 p {
     font-size: 22px;
 }
+ol {
+  list-style: decimal;
+  color: $epl-purple;
+}
 
 .header {
     background-color: $epl-green;
