@@ -21,7 +21,7 @@ function updateState(to) {
 function renderWeather() {
   const team = STATE.pickedTeam;
   // console.log(team + ' renderWeather');
-  const html = `<h2>Selected Team: ${team.TeamName}</h2>`;
+  const html = `<img src="${appState.iconURL}" alt="${team.teamName}" />`;
   $('.state__team').html(html);
   $('.teams').hide();
   $('.state__weather').hide();
@@ -33,7 +33,7 @@ function renderResults() {
   // console.log('renderWeather called');
   const weather = STATE.pickedWeather;
   // console.log(weather.weatherPicked + ' renderResults');
-  const html = `<h2>Selected Weather: ${weather.weatherPicked}</h2>`;
+  const html = `<div class="weather"><i class="${appState.weatherIcon}" alt="${weather.weatherPicked}"></i></div>`;
   $('.state__weather').html(html).show();
   $('.teams').hide();
   $('.weathers').hide();
@@ -55,6 +55,7 @@ function addBackBtn(from, to) {
 
 function watchInitialPage() {
   $('.selections__header').html('Select a team.');
+  $('.state').hide();
   $('.weathers, .teams').hide().empty();
   $('.lds-spinner').show();
   fetchLeagueTeams()
@@ -91,6 +92,7 @@ function watchTeamClick() {
     const teamId = $(this).data('team-id');
     console.log(teamId);
     appState.TeamName = $(this).data('team-name');
+    appState.iconURL = $(this).children('img').attr('src');
     handleTeamClick(teamId);
     updateState('pickedTeam');
   });
@@ -190,6 +192,7 @@ function addWeatherOptions(data) {
 
 function displayIconDivs(weatherChoices) {
   // console.log(weatherChoices);
+  $('.state').show();
   if ($('.weathers').html()) {
     $('.weathers').empty();
   }
@@ -205,6 +208,7 @@ function watchWeatherPicked(allWeather) {
   $('.weathers').on('click', '.weather', function() {
     const weatherPicked = $(this).children().attr('alt');
     appState.weatherPicked = weatherPicked;
+    appState.weatherIcon = $(this).children().attr('class');
     const pickedWeatherDates = getPickedWeatherDates(allWeather, weatherPicked);
     getMatchesFromWeatherDates(pickedWeatherDates, appState.LeagueMatches, weatherPicked);
     updateState('pickedWeather');
@@ -268,7 +272,7 @@ function goalsCounter(match, goalsObj) {
   }
 }
 function displayWeatherMatchedResults(weatherMatchedMatches, weatherPicked, record, totalGoals, weatherRecord, weatherGoals) {
-  $('.selections__header').html(`Results for ${appState.TeamName} playing in ${weatherPicked} weather`);
+  $('.selections__header').hide();
   $('.results').html(
       `<div class="results__season">
         <h2>Season Stats</h2>
