@@ -81,7 +81,6 @@ section:first-child {
   justify-self: end; }
   .state__team img {
     max-height: 200px;
-    border: 2px solid black;
     border-radius: 3px;
     padding: 1em; }
 
@@ -90,7 +89,6 @@ section:first-child {
   .state__weather .weather {
     padding: 42px 18px;
     max-width: 200px;
-    border: 2px solid black;
     border-radius: 3px; }
     .state__weather .weather i {
       font-size: 7em; }
@@ -168,20 +166,20 @@ section:first-child {
       margin-top: 10px; }
 
 .results {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-evenly;
+  max-width: 475px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(120px, 1fr));
+  grid-gap: 1px;
+  border: 1px solid #5D5D5D;
+  place-items: center start;
   text-align: left; }
-  .results__season {
-    margin-bottom: 25px; }
-  .results__weather {
-    margin-bottom: 25px; }
-  .results .result {
-    border-bottom: 2px solid black;
-    margin: 20px 30px;
-    padding: 10px 0 0; }
-    .results .result h3 {
-      margin-bottom: 10px; }
+  .results__item {
+    font-size: 20px;
+    padding: 15px 20px; }
+    .results__item--title {
+      font-size: 24px;
+      font-weight: bold; }
 
 footer {
   margin: 3em 0 0;

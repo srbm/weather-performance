@@ -26,7 +26,8 @@ function renderWeather() {
   $('.teams').hide();
   $('.state__weather').hide();
   $('.results').hide();
-  $('.weathers').show();
+
+  $('.weathers, .selections__header').show();
   addBackBtn('pickedTeam', 'initial');
 }
 function renderResults() {
@@ -55,7 +56,7 @@ function addBackBtn(from, to) {
 
 function watchInitialPage() {
   $('.selections__header').html('Select a team.');
-  $('.state').hide();
+  $('.state, .results').hide();
   $('.weathers, .teams').hide().empty();
   $('.lds-spinner').show();
   fetchLeagueTeams()
@@ -274,24 +275,28 @@ function goalsCounter(match, goalsObj) {
 function displayWeatherMatchedResults(weatherMatchedMatches, weatherPicked, record, totalGoals, weatherRecord, weatherGoals) {
   $('.selections__header').hide();
   $('.results').html(
-      `<div class="results__season">
-        <h2>Season Stats</h2>
-        <h3>Record: ${record.wins}-${record.losses}-${record.draws}</h3>
-        <h3>Win percent: ${(record.wins / (record.wins + record.losses + record.draws)).toFixed(3)}</h3>
-        <h3>Goals For: ${totalGoals.goalsFor}</h3>
-        <h3>GF/Game: ${(totalGoals.goalsFor / (record.wins + record.losses + record.draws)).toFixed(2)}</h3>
-        <h3>Goals Against: ${totalGoals.goalsAgainst}</h3>
-        <h3>GA/Game ${(totalGoals.goalsAgainst / (record.wins + record.losses + record.draws)).toFixed(2)}</h3>
-      </div>
-      <div class="results__weather">
-        <h2>Weather Stats</h2>
-        <h3>Record: ${weatherRecord.wins}-${weatherRecord.losses}-${weatherRecord.draws}</h3>
-        <h3>Win percent: ${(weatherRecord.wins / (weatherRecord.wins + weatherRecord.losses + weatherRecord.draws)).toFixed(3)}</h3>
-        <h3>Goals For: ${weatherGoals.goalsFor}</h3>
-        <h3>GF/Game: ${(weatherGoals.goalsFor / (weatherRecord.wins + weatherRecord.losses + weatherRecord.draws)).toFixed(2)}</h3>
-        <h3>Goals Against: ${weatherGoals.goalsAgainst}</h3>
-        <h3>GA/Game ${(weatherGoals.goalsAgainst / (weatherRecord.wins + weatherRecord.losses + weatherRecord.draws)).toFixed(2)}</h3>
-      </div>`);
+      `<div class="results__item results__item--title">Stat</div>
+      <div class="results__item results__item--title">2018-19 Season</div>
+      <div class="results__item results__item--title">Weather Selected</div>
+      <div class="results__item">Record</div>
+      <div class="results__item">${record.wins}-${record.losses}-${record.draws}</div>
+      <div class="results__item">${weatherRecord.wins}-${weatherRecord.losses}-${weatherRecord.draws}</div>
+      <div class="results__item">Win percent</div>
+      <div class="results__item">${(record.wins / (record.wins + record.losses + record.draws)).toFixed(3)}</div>
+      <div class="results__item">${(weatherRecord.wins / (weatherRecord.wins + weatherRecord.losses + weatherRecord.draws)).toFixed(3)}</div>
+      <div class="results__item">Goals For</div>
+      <div class="results__item">${totalGoals.goalsFor}</div>
+      <div class="results__item">${weatherGoals.goalsFor}</div>
+      <div class="results__item">GF/Game</div>
+      <div class="results__item">${(totalGoals.goalsFor / (record.wins + record.losses + record.draws)).toFixed(2)}</div>
+      <div class="results__item">${(weatherGoals.goalsFor / (weatherRecord.wins + weatherRecord.losses + weatherRecord.draws)).toFixed(2)}</div>
+      <div class="results__item">Goals Against</div>
+      <div class="results__item">${totalGoals.goalsAgainst}</div>
+      <div class="results__item">${weatherGoals.goalsAgainst}</div>
+      <div class="results__item">GA/Game</div>
+      <div class="results__item">${(totalGoals.goalsAgainst / (record.wins + record.losses + record.draws)).toFixed(2)}</div>
+      <div class="results__item">${(weatherGoals.goalsAgainst / (weatherRecord.wins + weatherRecord.losses + weatherRecord.draws)).toFixed(2)}</div>
+      `);
   $('.weathers').hide();
 
 
@@ -327,7 +332,7 @@ function handleFetchResponse(fetchedPromise) {
   return fetchedPromise.json()
       .then(json => {
         // console.log(fetchedPromise.ok);
-      if (fetchedPromise.ok) {
+        if (fetchedPromise.ok) {
           return Promise.resolve(json);
         } else {
           throw Error(fetchedPromise);
