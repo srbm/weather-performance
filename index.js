@@ -46,7 +46,7 @@ function addBackBtn(from, to) {
   });
   $('.state__btn').html(backBtn);
 }
-
+// End State functions
 
 
 function watchInitialPage() {
@@ -55,33 +55,41 @@ function watchInitialPage() {
   $('.weathers, .teams').hide().empty();
   $('.lds-spinner').show();
   fetchLeagueTeams()
-      .then(handleFetchResponse)
-      .then(json => {
-        addTeamsToDom(json);
-        $('.teams').show();
-      })
-      .catch(e => {
-        console.log(e + '; watchInitialPage ');
-        handleError(e);
-      })
-      .finally(() => {
-        $('.lds-spinner').hide();
-      });
+    .then(handleFetchResponse)
+    .then(json => {
+      addTeamsToDom(json);
+      $('.teams').show();
+    })
+    .catch(e => {
+      console.log(e + '; watchInitialPage ');
+      handleError(e);
+    })
+    .finally(() => {
+      $('.lds-spinner').hide();
+    });
 }
 function addTeamsToDom(response) {
   for (let i = 0; i<20; i++) {
     const teamId = response.teams[i].id;
     const teamName = response.teams[i].name;
+    const url = checkHTTPS(response.teams[i].crestUrl);
     $('.teams').append(`<div class="team"><img></img><h3></h3></div>`);
     $('.team:eq('+i+')').data('team-name', teamName);
     $('.team:eq('+i+')').data('team-id', teamId);
-    $('.team:eq('+i+') img').attr('src', response.teams[i].crestUrl);
+    $('.team:eq('+i+') img').attr('src', url);
     $('.team:eq('+i+') img').attr('alt', teamName);
     $('.team:eq('+i+') h3').html(`${teamName}`);
   }
   $('.team img').on('load', () => {
     $('.team').css('display', 'flex');
   });
+}
+function checkHTTPS(url) {
+  if(url.match('^http:')) {
+    return url.replace(/^http:\/\//i, 'https://');
+  } else {
+    return url;
+  }
 }
 function watchTeamClick() {
   $('.teams').on('click', '.team', function() {
@@ -98,19 +106,18 @@ function handleTeamClick(teamId) {
   $('.selections__header').html('Select a weather condition');
   changeToWeatherOptions(teamId);
 }
-
 function changeToWeatherOptions(teamId) {
   toggleSpinner();
   fetchAllTeamMatches(teamId)
-      .then(handleFetchResponse)
-      .then(getWeatherCallParams)
-      .then(getWeatherData)
-      .then(addWeatherOptions)
-      .catch(e => {
-        console.log(e + '; --changeToWeatherOptions');
-        handleError(e);
-      })
-      .finally(toggleSpinner);
+    .then(handleFetchResponse)
+    .then(getWeatherCallParams)
+    .then(getWeatherData)
+    .then(addWeatherOptions)
+    .catch(e => {
+      console.log(e + '; --changeToWeatherOptions');
+      handleError(e);
+    })
+    .finally(toggleSpinner);
 }
 function getWeatherCallParams(data) {
   const weatherCallsParams = [];
@@ -140,17 +147,9 @@ function makeWeatherCallParamsObj(matches, homeTeamsArr, weatherCallsParams) {
     });
   }
 }
-
 function getPLTeamMatchesData(data) {
-  const PLMatches = [];
-  for (let i = 0; i<data.count; i++) {
-    if (data.matches[i].competition.name === "Premier League") {
-      PLMatches.push(data.matches[i]);
-    }
-  }
-  return PLMatches;
+  return data.matches.filter(match => match.competition.name === "Premier League");
 }
-
 function getWeatherData(paramsArr) {
   const weathersPromArr = [];
   for (let i=0; i < paramsArr.length; i++) {

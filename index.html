@@ -3,6 +3,7 @@
     <head>
         <title>Weather Performance</title>
         <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta charset="utf-8"/>
         <link rel="stylesheet" type="text/css" href="https://meyerweb.com/eric/tools/css/reset/reset.css">
         <link rel="stylesheet" type="text/css" href="style.css">
         <link href="https://fonts.googleapis.com/css?family=Be+Vietnam|Slabo+27px&display=swap" rel="stylesheet">
@@ -23,11 +24,11 @@
         </header>
         <main>
             <section class="selections">
-                <h2 class="selections__header">Select a team.</h2>
+                <h2 class="selections__header" aria-live="polite">Select a team.</h2>
                 <div class="state">
-                    <div class="state__team"></div>
-                    <div class="state__weather"></div>
-                    <div class="state__btn"></div>
+                    <div class="state__team" aria-live="polite"></div>
+                    <div class="state__weather" aria-live="polite"></div>
+                    <div class="state__btn" aria-live="polite"></div>
                 </div>
                 <div class="errors"></div>
                 <div class="lds-spinner"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>
