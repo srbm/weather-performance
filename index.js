@@ -34,7 +34,9 @@ function renderResults() {
   // console.log('renderWeather called');
   const weather = STATE.pickedWeather;
   // console.log(weather.weatherPicked + ' renderResults');
-  const html = `<div class="weather"><i class="${appState.weatherIcon}" alt="${weather.weatherPicked}"></i></div>`;
+  const html = `<div class="weather">
+                  <i class="${appState.weatherIcon}" alt="${weather.weatherPicked}"></i>
+                  </div>`;
   $('.state__weather').html(html).show();
   $('.teams').hide();
   $('.weathers').hide();
@@ -198,9 +200,10 @@ function displayIconDivs(weatherChoices) {
     $('.weathers').empty();
   }
   weatherChoices.forEach(function(icon) {
+    const header = formatWeatherHeader(icon);
     $('.weathers').append(`<div class="weather">
                             <i class="wi wi-forecast-io-${icon}" alt="${icon}"/></i>
-                              <p>${icon}</p>
+                              <p>${header}</p>
                           </div>`);
   });
   $('.weathers').show();
@@ -279,7 +282,7 @@ function displayWeatherMatchedResults(weatherMatchedMatches, weatherPicked, reco
       <tr>
         <th class="results__item results__item--title">Stat</th>
         <th class="results__item results__item--title">2018-19 Season</th>
-        <th class="results__item results__item--title">Weather Selected</th>
+        <th class="results__item results__item--title">${formatWeatherHeader(appState.weatherPicked)}</th>
       </tr>
       <tr>
         <td class="results__item">Record</td>
@@ -325,8 +328,14 @@ function displayWeatherMatchedResults(weatherMatchedMatches, weatherPicked, reco
   //       </div>`);
   // });
 }
-
-
+function capitalize(word) {
+  const wordArr = word.split('');
+  wordArr[0] = wordArr[0].toUpperCase();
+  return wordArr.join('');
+}
+function formatWeatherHeader(weather) {
+  return weather.split('-').map(capitalize).join(' ');
+}
 
 
 

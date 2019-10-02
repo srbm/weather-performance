@@ -57,6 +57,7 @@ a {
     }
     &__headline {
         margin: 30px auto 0;
+        width: 75%;
         @media screen and (min-width: 650px) {
           margin: 0 2em 0;
         }
@@ -77,15 +78,12 @@ section:first-child {
     text-align: center;
     margin-right: 15px;
     margin-left: 15px;
-    h2 {
-        font-size: 28px;
-        font-family: sans-serif;
-        margin-bottom: 1.2em;
-    }
 }
 .selections {
     .selections__header {
-        margin-bottom: .5em;
+      font-family: 'Be Vietnam', sans-serif;
+      font-size: 28px;
+      margin-bottom: .5em;
     }
     h3 {
         font-size: 24px;
@@ -108,12 +106,10 @@ section:first-child {
   }
 }
 .state__team {
-
   img {
     max-height: 160px;
-    border-radius: 3px;
     padding: 1em;
-    @media screen and (mind-width: 750px) {
+    @media screen and (min-width: 750px) {
       max-height: 200px;
     }
   }
@@ -121,7 +117,7 @@ section:first-child {
 .state__weather {
   justify-self: start;
   .weather {
-    padding: 42px 18px;
+    padding: 0 18px;
     max-width: 200px;
     border-radius: 3px;
     i {
@@ -210,13 +206,14 @@ section:first-child {
         }
         p {
             margin-top: 10px;
+            max-width: 150px;
         }
     }
 }
 .results {
   max-width: 650px;
   margin: 1em auto 0;
-  border-top: 3px solid $epl-blue;
+  border-top: 3px solid grey;
   text-align: left;
   table {
     margin: 0 auto;
@@ -226,7 +223,7 @@ section:first-child {
     font-family: 'Be Vietnam', sans-serif;
     padding: 0;
     line-height: 26px;
-    border-bottom: 1px solid $epl-blue;
+    border-bottom: 1px solid grey;
     min-width: 95px;
     @media screen and (min-width: 375px) {
       min-width: 125px;
@@ -252,7 +249,12 @@ footer {
     position: absolute;
     bottom: 0;
     text-align: center;
-
+  a {
+    color: $epl-pink;
+    &:visited {
+      color: $epl-purple;
+    }
+  }
 }
 
 // Loader CSS
