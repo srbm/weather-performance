@@ -180,6 +180,7 @@ section:first-child {
       max-width: 150px; }
 
 .results {
+  display: none;
   max-width: 650px;
   margin: 1em auto 0;
   border-top: 3px solid grey;
