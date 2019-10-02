@@ -74,7 +74,7 @@ a {
     color: $epl-purple;
   }
 }
-section:first-child {
+section {
   text-align: center;
   margin-right: 15px;
   margin-left: 15px;
@@ -264,10 +264,11 @@ footer {
 // Loader CSS
 .lds-spinner {
   color: $epl-green;
-  display: inline-block;
+  display: block;
   position: relative;
   width: 64px;
   height: 64px;
+  margin: 0 auto;
 }
 .lds-spinner div {
   transform-origin: 32px 32px;

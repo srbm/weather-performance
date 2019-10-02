@@ -59,7 +59,7 @@ a {
     margin: .5em auto 0;
     color: #38003c; }
 
-section:first-child {
+section {
   text-align: center;
   margin-right: 15px;
   margin-left: 15px; }
@@ -224,10 +224,11 @@ footer {
 
 .lds-spinner {
   color: #00ff85;
-  display: inline-block;
+  display: block;
   position: relative;
   width: 64px;
-  height: 64px; }
+  height: 64px;
+  margin: 0 auto; }
 
 .lds-spinner div {
   transform-origin: 32px 32px;

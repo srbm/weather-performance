@@ -73,7 +73,7 @@ function addTeamsToDom(response) {
     const teamId = response.teams[i].id;
     const teamName = response.teams[i].name;
     const url = checkHTTPS(response.teams[i].crestUrl);
-    $('.teams').append(`<div class="team"><img></img><h3></h3></div>`);
+    $('.teams').append(`<div class="team" tabindex=0><img></img><h3></h3></div>`);
     $('.team:eq('+i+')').data('team-name', teamName);
     $('.team:eq('+i+')').data('team-id', teamId);
     $('.team:eq('+i+') img').attr('src', url);
@@ -94,7 +94,6 @@ function checkHTTPS(url) {
 function watchTeamClick() {
   $('.teams').on('click', '.team', function() {
     const teamId = $(this).data('team-id');
-    console.log(teamId);
     appState.TeamName = $(this).data('team-name');
     appState.iconURL = $(this).children('img').attr('src');
     handleTeamClick(teamId);
@@ -183,7 +182,7 @@ function displayIconDivs(weatherChoices) {
   }
   weatherChoices.forEach(function(icon) {
     const header = formatWeatherHeader(icon);
-    $('.weathers').append(`<div class="weather">
+    $('.weathers').append(`<div class="weather" tabindex=0>
                             <i class="wi wi-forecast-io-${icon}" alt="${icon}"/></i>
                               <p>${header}</p>
                           </div>`);
@@ -324,7 +323,6 @@ function fetchWeather(paramsArr, i) {
 function handleFetchResponse(fetchedPromise) {
   return fetchedPromise.json()
       .then(json => {
-        // console.log(fetchedPromise.ok);
         if (fetchedPromise.ok) {
           return Promise.resolve(json);
         } else {
