@@ -21,3 +21,6 @@ Once the user has selected a weather condition they are presented with a table o
 - jQuery
 - HTML
 - CSS/Sass
+- APIs
+    - [Football Data](https://www.football-data.org/)
+    - [Darksky Weather](https://darksky.net)
