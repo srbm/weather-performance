@@ -1,5 +1,3 @@
-/* eslint-disable require-jsdoc */
-/* eslint-disable no-invalid-this */
 'use strict';
 const STATE = {
 };
@@ -13,14 +11,11 @@ const appState = {
   'TeamName' : '',
 };
 function updateState(to) {
-  // console.log('updateState called');
-  // console.log('updateState return function called' + data);
   STATE[to] = appState;
   return stateRenders[to]();
 }
 function renderWeather() {
   const team = STATE.pickedTeam;
-  // console.log(team + ' renderWeather');
   const html = `<img src="${appState.iconURL}" alt="${team.teamName}" />`;
   $('.state__team').html(html);
   $('.teams').hide();
@@ -31,9 +26,7 @@ function renderWeather() {
   addBackBtn('pickedTeam', 'initial');
 }
 function renderResults() {
-  // console.log('renderWeather called');
   const weather = STATE.pickedWeather;
-  // console.log(weather.weatherPicked + ' renderResults');
   const html = `<div class="weather">
                   <i class="${appState.weatherIcon}" alt="${weather.weatherPicked}"></i>
                   </div>`;
@@ -101,7 +94,7 @@ function watchTeamClick() {
   });
 }
 function handleTeamClick(teamId) {
-  hideAllTeams();
+  $('.teams').hide();
   $('.selections__header').html('Select a weather condition');
   changeToWeatherOptions(teamId);
 }
@@ -148,8 +141,6 @@ function makeWeatherCallParamsObj(matches, homeTeamsArr, weatherCallsParams) {
   }
 }
 
-
-
 function getPLTeamMatchesData(data) {
   const PLMatches = [];
   for (let i = 0; i<data.count; i++) {
@@ -157,28 +148,22 @@ function getPLTeamMatchesData(data) {
       PLMatches.push(data.matches[i]);
     }
   }
-  //   console.log(data.matches);
-  // const PLMatches = data.matches.filter(match => {
-  //   match.competition.name === "Premier League"
-  // });
-  // console.log(PLMatches + ' --PLMatches');
   return PLMatches;
 }
 
 function getWeatherData(paramsArr) {
   const weathersPromArr = [];
-  
   for (let i=0; i < paramsArr.length; i++) {
     weathersPromArr.push(fetchWeather(paramsArr, i));
   }
   return Promise.all(weathersPromArr)
-    .then(arr => {
-      const promArr = [];
-      arr.forEach(item => {
-        promArr.push(item.json());
+      .then(arr => {
+        const promArr = [];
+        arr.forEach(item => {
+          promArr.push(item.json());
+        });
+        return Promise.all(promArr);
       });
-      return Promise.all(promArr);
-    });
 }
 
 function addWeatherOptions(data) {
@@ -189,12 +174,10 @@ function addWeatherOptions(data) {
     weatherPerGame.push(item.currently);
   });
   displayIconDivs(weatherChoices);
-  // console.log(weatherPerGame);
   watchWeatherPicked(weatherPerGame);
 }
 
 function displayIconDivs(weatherChoices) {
-  // console.log(weatherChoices);
   $('.state').show();
   if ($('.weathers').html()) {
     $('.weathers').empty();
@@ -220,7 +203,6 @@ function watchWeatherPicked(allWeather) {
 }
 function getPickedWeatherDates(allWeather, weatherPicked) {
   const pickedWeatherDates = [];
-  // console.log(weatherPicked);
   allWeather.forEach(item => {
     if (weatherPicked === item.icon) {
       const date = new Date(item.time*1000).getTime();
@@ -317,17 +299,8 @@ function displayWeatherMatchedResults(weatherMatchedMatches, weatherPicked, reco
     </table>
       `);
   $('.weathers').hide();
-
-
-  // Individual Game Results
-  // weatherMatchedMatches.forEach(match => {
-  //   $('.results').html(
-  //       `<div class="result">
-  //         <h4>${match.homeTeam} Score: ${match.score.homeTeam}</h4>
-  //         <h4>${match.awayTeam} Score: ${match.score.awayTeam}</h4>
-  //       </div>`);
-  // });
 }
+
 function capitalize(word) {
   const wordArr = word.split('');
   wordArr[0] = wordArr[0].toUpperCase();
@@ -336,10 +309,6 @@ function capitalize(word) {
 function formatWeatherHeader(weather) {
   return weather.split('-').map(capitalize).join(' ');
 }
-
-
-
-
 
 function fetchLeagueTeams() {
   return fetch(`https://api.football-data.org/v2/competitions/PL/teams?season=2018`,
@@ -371,9 +340,6 @@ function handleError(err) {
 
 function toggleSpinner() {
   $('.lds-spinner').toggle();
-}
-function hideAllTeams() {
-  $('.teams').hide();
 }
 
 const GlobalLatLong = [
