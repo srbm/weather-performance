@@ -80,15 +80,19 @@ section:first-child {
 .state {
   display: flex;
   flex-wrap: wrap;
-  justify-content: center;
+  justify-content: space-around;
   align-items: center; }
+  @media screen and (min-width: 750px) {
+    .state {
+      width: 35vw;
+      margin: 0 auto; } }
 
 .state__team img {
-  max-height: 160px;
+  max-height: 150px;
   padding: 1em; }
   @media screen and (min-width: 750px) {
     .state__team img {
-      max-height: 200px; } }
+      max-height: 180px; } }
 
 .state__weather {
   justify-self: start; }
@@ -143,6 +147,7 @@ section:first-child {
         .teams .team img {
           height: 170px; } }
     .teams .team h3 {
+      font-family: 'Slabo 27px', serif;
       margin-top: .5em;
       font-size: 18px;
       max-width: 114px; }
@@ -157,7 +162,7 @@ section:first-child {
 .weathers {
   display: flex;
   flex-wrap: wrap;
-  justify-content: space-evenly; }
+  justify-content: center; }
   .weathers .weather {
     margin: 30px 10px 0;
     padding: 30px 12px;
