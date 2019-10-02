@@ -274,28 +274,44 @@ function goalsCounter(match, goalsObj) {
 }
 function displayWeatherMatchedResults(weatherMatchedMatches, weatherPicked, record, totalGoals, weatherRecord, weatherGoals) {
   $('.selections__header').hide();
-  $('.results').html(
-      `<div class="results__item results__item--title">Stat</div>
-      <div class="results__item results__item--title">2018-19 Season</div>
-      <div class="results__item results__item--title">Weather Selected</div>
-      <div class="results__item">Record</div>
-      <div class="results__item">${record.wins}-${record.losses}-${record.draws}</div>
-      <div class="results__item">${weatherRecord.wins}-${weatherRecord.losses}-${weatherRecord.draws}</div>
-      <div class="results__item">Win percent</div>
-      <div class="results__item">${(record.wins / (record.wins + record.losses + record.draws)).toFixed(3)}</div>
-      <div class="results__item">${(weatherRecord.wins / (weatherRecord.wins + weatherRecord.losses + weatherRecord.draws)).toFixed(3)}</div>
-      <div class="results__item">Goals For</div>
-      <div class="results__item">${totalGoals.goalsFor}</div>
-      <div class="results__item">${weatherGoals.goalsFor}</div>
-      <div class="results__item">GF/Game</div>
-      <div class="results__item">${(totalGoals.goalsFor / (record.wins + record.losses + record.draws)).toFixed(2)}</div>
-      <div class="results__item">${(weatherGoals.goalsFor / (weatherRecord.wins + weatherRecord.losses + weatherRecord.draws)).toFixed(2)}</div>
-      <div class="results__item">Goals Against</div>
-      <div class="results__item">${totalGoals.goalsAgainst}</div>
-      <div class="results__item">${weatherGoals.goalsAgainst}</div>
-      <div class="results__item">GA/Game</div>
-      <div class="results__item">${(totalGoals.goalsAgainst / (record.wins + record.losses + record.draws)).toFixed(2)}</div>
-      <div class="results__item">${(weatherGoals.goalsAgainst / (weatherRecord.wins + weatherRecord.losses + weatherRecord.draws)).toFixed(2)}</div>
+  $('.results').html(`
+    <table>
+      <tr>
+        <th class="results__item results__item--title">Stat</th>
+        <th class="results__item results__item--title">2018-19 Season</th>
+        <th class="results__item results__item--title">Weather Selected</th>
+      </tr>
+      <tr>
+        <td class="results__item">Record</td>
+        <td class="results__item">${record.wins}-${record.losses}-${record.draws}</td>
+        <td class="results__item">${weatherRecord.wins}-${weatherRecord.losses}-${weatherRecord.draws}</td>
+      </tr>
+      <tr>
+        <td class="results__item">Win percent</td>
+        <td class="results__item">${(record.wins / (record.wins + record.losses + record.draws)).toFixed(3)}</td>
+        <td class="results__item">${(weatherRecord.wins / (weatherRecord.wins + weatherRecord.losses + weatherRecord.draws)).toFixed(3)}</td>
+      </tr>
+      <tr>
+        <td class="results__item">Goals For</td>
+        <td class="results__item">${totalGoals.goalsFor}</td>
+        <td class="results__item">${weatherGoals.goalsFor}</td>
+      </tr>
+      <tr>
+        <td class="results__item">GF/Game</td>
+        <td class="results__item">${(totalGoals.goalsFor / (record.wins + record.losses + record.draws)).toFixed(2)}</td>
+        <td class="results__item">${(weatherGoals.goalsFor / (weatherRecord.wins + weatherRecord.losses + weatherRecord.draws)).toFixed(2)}</td>
+      </tr>
+      <tr>
+        <td class="results__item">Goals Against</td>
+        <td class="results__item">${totalGoals.goalsAgainst}</td>
+        <td class="results__item">${weatherGoals.goalsAgainst}</td>
+      </tr>
+      <tr>
+        <td class="results__item">GA/Game</td>
+        <td class="results__item">${(totalGoals.goalsAgainst / (record.wins + record.losses + record.draws)).toFixed(2)}</td>
+        <td class="results__item">${(weatherGoals.goalsAgainst / (weatherRecord.wins + weatherRecord.losses + weatherRecord.draws)).toFixed(2)}</td>
+      </tr>
+    </table>
       `);
   $('.weathers').hide();
 
