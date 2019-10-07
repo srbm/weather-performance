@@ -18,10 +18,7 @@ function renderWeather() {
   const team = STATE.pickedTeam;
   const html = `<img src="${appState.iconURL}" alt="${team.teamName}" />`;
   $('.state__team').html(html);
-  $('.teams').hide();
-  $('.state__weather').hide();
-  $('.results').hide();
-
+  $('.teams, .state__weather, .results').hide();
   $('.weathers, .selections__header').show();
   addBackBtn('pickedTeam', 'initial');
 }
@@ -30,10 +27,9 @@ function renderResults() {
   const html = `<div class="weather">
                   <i class="${appState.weatherIcon}" alt="${weather.weatherPicked}"></i>
                   </div>`;
-  $('.state__weather').html(html).show();
-  $('.teams').hide();
-  $('.weathers').hide();
-  $('.results').show();
+  $('.state__weather').html(html);
+  $('.teams, .weathers').hide();
+  $('.results, .state__weather').show();
   addBackBtn('pickedWeather', 'pickedTeam');
 }
 
@@ -51,8 +47,8 @@ function addBackBtn(from, to) {
 
 function watchInitialPage() {
   $('.selections__header').html('Select a team.');
-  $('.state, .results').hide();
-  $('.weathers, .teams').hide().empty();
+  $('.state').hide();
+  $('.weathers, .teams, .results').hide().empty();
   $('.lds-spinner').show();
   fetchLeagueTeams()
     .then(handleFetchResponse)
@@ -176,18 +172,19 @@ function addWeatherOptions(data) {
 }
 
 function displayIconDivs(weatherChoices) {
+  const weathersSection = $('.weathers');
   $('.state').show();
-  if ($('.weathers').html()) {
-    $('.weathers').empty();
+  if (weathersSection.html()) {
+    weathersSection.empty();
   }
   weatherChoices.forEach(function(icon) {
     const header = formatWeatherHeader(icon);
-    $('.weathers').append(`<div class="weather" tabindex=0>
+    weathersSection.append(`<div class="weather" tabindex=0>
                             <i class="wi wi-forecast-io-${icon}" alt="${icon}"/></i>
                               <p>${header}</p>
                           </div>`);
   });
-  $('.weathers').show();
+  weathersSection.show();
 }
 function watchWeatherPicked(allWeather) {
   $('.weathers').on('click', '.weather', function() {
