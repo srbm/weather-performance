@@ -1,3 +1,5 @@
+/* eslint-disable require-jsdoc */
+/* eslint-disable max-len */
 'use strict';
 const STATE = {
 };
@@ -5,10 +7,10 @@ const stateRenders = {
   initial: watchInitialPage,
   pickedTeam: renderWeather,
   pickedWeather: renderResults,
-}
+};
 const appState = {
-  'LeagueMatches' : [],
-  'TeamName' : '',
+  'LeagueMatches': [],
+  'TeamName': '',
 };
 function updateState(to) {
   STATE[to] = appState;
@@ -51,18 +53,18 @@ function watchInitialPage() {
   $('.weathers, .teams, .results').hide().empty();
   $('.lds-spinner').show();
   fetchLeagueTeams()
-    .then(handleFetchResponse)
-    .then(json => {
-      addTeamsToDom(json);
-      $('.teams').show();
-    })
-    .catch(e => {
-      console.log(e + '; watchInitialPage ');
-      handleError(e);
-    })
-    .finally(() => {
-      $('.lds-spinner').hide();
-    });
+      .then(handleFetchResponse)
+      .then((json) => {
+        addTeamsToDom(json);
+        $('.teams').show();
+      })
+      .catch((e) => {
+        console.log(e + '; watchInitialPage ');
+        handleError(e);
+      })
+      .finally(() => {
+        $('.lds-spinner').hide();
+      });
 }
 function addTeamsToDom(response) {
   for (let i = 0; i<20; i++) {
@@ -81,7 +83,7 @@ function addTeamsToDom(response) {
   });
 }
 function checkHTTPS(url) {
-  if(url.match('^http:')) {
+  if (url.match('^http:')) {
     return url.replace(/^http:\/\//i, 'https://');
   } else {
     return url;
@@ -89,6 +91,7 @@ function checkHTTPS(url) {
 }
 function watchTeamClick() {
   $('.teams').on('click', '.team', function() {
+    console.log($(this).data());
     const teamId = $(this).data('team-id');
     appState.TeamName = $(this).data('team-name');
     appState.iconURL = $(this).children('img').attr('src');
@@ -104,15 +107,15 @@ function handleTeamClick(teamId) {
 function changeToWeatherOptions(teamId) {
   toggleSpinner();
   fetchAllTeamMatches(teamId)
-    .then(handleFetchResponse)
-    .then(getWeatherCallParams)
-    .then(getWeatherData)
-    .then(addWeatherOptions)
-    .catch(e => {
-      console.log(e + '; --changeToWeatherOptions');
-      handleError(e);
-    })
-    .finally(toggleSpinner);
+      .then(handleFetchResponse)
+      .then(getWeatherCallParams)
+      .then(getWeatherData)
+      .then(addWeatherOptions)
+      .catch((e) => {
+        console.log(e + '; --changeToWeatherOptions');
+        handleError(e);
+      })
+      .finally(toggleSpinner);
 }
 function getWeatherCallParams(data) {
   const weatherCallsParams = [];
@@ -124,14 +127,14 @@ function getWeatherCallParams(data) {
 }
 function getGameHomeTeam(matches) {
   const homeTeams = [];
-  matches.forEach( ele => {
+  matches.forEach( (ele) => {
     homeTeams.push(ele.homeTeam);
   });
   return homeTeams;
 }
 function makeWeatherCallParamsObj(matches, homeTeamsArr, weatherCallsParams) {
   for (let i=0; i<homeTeamsArr.length; i++) {
-    GlobalLatLong.forEach( obj => {
+    GlobalLatLong.forEach( (obj) => {
       if (homeTeamsArr[i].name === obj.team) {
         weatherCallsParams.push({
           'utcDate': matches[i].utcDate,
@@ -143,7 +146,7 @@ function makeWeatherCallParamsObj(matches, homeTeamsArr, weatherCallsParams) {
   }
 }
 function getPLTeamMatchesData(data) {
-  return data.matches.filter(match => match.competition.name === "Premier League");
+  return data.matches.filter((match) => match.competition.name === 'Premier League');
 }
 function getWeatherData(paramsArr) {
   const weathersPromArr = [];
@@ -151,11 +154,12 @@ function getWeatherData(paramsArr) {
     weathersPromArr.push(fetchWeather(paramsArr, i));
   }
   return Promise.all(weathersPromArr)
-      .then(arr => {
+      .then((arr) => {
         const promArr = [];
-        arr.forEach(item => {
+        arr.forEach((item) => {
           promArr.push(item.json());
         });
+        console.log(promArr);
         return Promise.all(promArr);
       });
 }
@@ -163,7 +167,7 @@ function getWeatherData(paramsArr) {
 function addWeatherOptions(data) {
   const weatherChoices = new Set();
   const weatherPerGame = [];
-  data.forEach(item => {
+  data.forEach((item) => {
     weatherChoices.add(item.currently.icon);
     weatherPerGame.push(item.currently);
   });
@@ -198,7 +202,7 @@ function watchWeatherPicked(allWeather) {
 }
 function getPickedWeatherDates(allWeather, weatherPicked) {
   const pickedWeatherDates = [];
-  allWeather.forEach(item => {
+  allWeather.forEach((item) => {
     if (weatherPicked === item.icon) {
       const date = new Date(item.time*1000).getTime();
       pickedWeatherDates.push(date);
@@ -212,7 +216,7 @@ function getMatchesFromWeatherDates(pickedWeatherDates, leagueMatches, weatherPi
   const totalRecordObj = {'wins': 0, 'losses': 0, 'draws': 0};
   const totalGoals = {'goalsFor': 0, 'goalsAgainst': 0};
   const weatherGoals = {'goalsFor': 0, 'goalsAgainst': 0}
-  leagueMatches.forEach(match => {
+  leagueMatches.forEach((match) => {
     winLossCounter(match.homeTeam.name, match.awayTeam.name, match.score.winner, totalRecordObj);
     goalsCounter(match, totalGoals);
     const mDate = new Date(match.utcDate).getTime();
@@ -319,7 +323,7 @@ function fetchWeather(paramsArr, i) {
 }
 function handleFetchResponse(fetchedPromise) {
   return fetchedPromise.json()
-      .then(json => {
+      .then((json) => {
         if (fetchedPromise.ok) {
           return Promise.resolve(json);
         } else {
